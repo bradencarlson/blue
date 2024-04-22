@@ -68,6 +68,7 @@ $COLUMN1 --match ${UNDERLINE}file$NORMAL $COLUMN2 File to use to print matching 
                 $COLUMN2 is given.\n
 $COLUMN1 -n, --no-match ${UNDERLINE}file$NORMAL $COLUMN2 File to use to print unmatching lines, if an appropriate operation\n
                 $COLUMN2 is given.\n
+$COLUMN1 --backup $COLUMN2 Backup all files before changing them in any way.\n 
 " 
 
 # files
@@ -87,7 +88,9 @@ MATCH_FLAG=0
 DIFFERENCE_FLAG=0
 DIFFERENCE_ARG_FLAG=0
 CAPITALIZE_FLAG=0
+BACKUP_FLAG=0
 SKIP_LINE_ENDING_CHECK=0
+
 
 DIFF_ARG0=""
 DIFF_ARG1=""
@@ -159,6 +162,8 @@ for opt in $@; do
                 CAPITALIZE_FLAG=1
                 ACTIONS[$POS]="capitalize"
                 POS=$(($POS + 1))
+        elif [[ $opt == "--backup" ]]; then 
+                BACKUP_FLAG=1
         else
                 echo "Invalid argument: $opt"
                 echo "exiting..."
@@ -185,7 +190,11 @@ test_file_exists $ACCEPTED_FILE
 
 fix_line_endings() {
         if [[ $SKIP_LINE_ENDING_CHECK == 0 ]]; then 
-                [[ ! -z $1 ]] && [[ -f $1 ]] && sed -E -i.bak 's/\r//g' $1;
+                if [[ $BACKUP_FLAG == 1 ]]; then 
+                        [[ ! -z $1 ]] && [[ -f $1 ]] && sed -E -i.bak 's/\r//g' $1;
+                else 
+                        [[ ! -z $1 ]] && [[ -f $1 ]] && sed -E -i 's/\r//g' $1;
+                fi
         fi
 }
 
@@ -196,7 +205,11 @@ fix_line_endings $ACCEPTED_FILE
 ## Helper functions
 
 capitalize_names() {
-        [[ ! -z $1 ]] && [[ -f $1 ]] && sed -Ei.before_caps 's/\<([a-z])([a-z]*)\>/\u\1\2/g' $1
+        if [[ $BACKUP_FLAG == 1 ]]; then
+                [[ ! -z $1 ]] && [[ -f $1 ]] && sed -Ei.before_caps 's/\<([a-z])([a-z]*)\>/\u\1\2/g' $1
+        else 
+                [[ ! -z $1 ]] && [[ -f $1 ]] && sed -E -i 's/\<([a-z])([a-z]*)\>/\u\1\2/g' $1
+        fi
 }
 
 clean_up() {
@@ -219,7 +232,7 @@ comparison() {
                                         echo $line >> $NO_MATCH_FILE
                                 fi
                         else
-                                [[ ! -z $MATCH_FILE ]] && echo $line >> $MATCH_FILE
+                                [[ ! -z $MATCH_FILE ]] && echo "$FOUND" >> $MATCH_FILE
                         fi
                 done < $1
         else 
@@ -249,8 +262,10 @@ for action in ${ACTIONS[@]}; do
                 
 done
 
-echo "Running clean up..."
-clean_up
+if [[ $BACKUP_FLAG == 1 ]]; then
+        echo "Running clean up..."
+        clean_up
+fi
 
 
 # Copyright 2024 Braden Carlson
