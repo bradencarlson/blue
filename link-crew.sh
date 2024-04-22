@@ -1,5 +1,23 @@
 #!/bin/bash
 
+# link-crew.sh 
+# Written By: Braden Carlson 
+# Date: April 2024
+#
+# This script was written for use in the link crew program, to solve the
+# task of taking a list of students who had been accepted as link crew leaders 
+# and comparing it to a list of students who had been recommended by faculty. 
+# This script can also perform the same comparison on students who have 
+# been recommended but are not on an applied list. Another application of 
+# this script is to take a list of students and extract their information from 
+# a 'master' file, which may contain more information such as a parent's email. 
+#
+# This script can also take a list of names and correct any capitalization 
+# mistakes that are found in the script.  Run this script with the -h or --help 
+# option to get started. 
+#
+# See bottom for license information.
+
 
 SCRIPT_NAME="link-crew.sh"
 VERSION="0"
@@ -8,6 +26,7 @@ VERSION="0"
 ITALIC="\033[3;80m"
 UNDERLINE="\033[4;80m"
 NORMAL="\033[0;00m"
+BOLD="\033[1;80m"
 
 # These four control where text is printed vertically on the screen, 
 # makes life much easier than entering a bunch of tabs everywhere...
@@ -18,13 +37,22 @@ COLUMN4="\033[100D\033[40C"
 HELP_MESSAGE="This is $SCRIPT_NAME v$VERSION\n\n
 Usage: $SCRIPT_NAME [options]\n
 \n
+This script is designed for use with three lists of students, namely\n
+$COLUMN1 - recommended\n
+$COLUMN1 - accepted\n
+$COLUMN1 - master\n
+The recommended and accepted lists should simply be lists of names, while\n
+the master list must contain a column which matches up with the information\n
+found in the recommended and/or accepted list, which will be used for comparing\n
+the two files and finding matches and differences. \n\n
+${BOLD}Please make sure data is clean (no extra spaces please) before using this script.${NORMAL}\n\n
 Available options:\n
-$COLUMN1 -h, --help: $COLUMN2 Display this text.\n
-$COLUMN1 --master ${UNDERLINE}file$NORMAL $COLUMN2 Use ${UNDERLINE}file$NORMAL as the master file.\n
-$COLUMN1 --recommended ${UNDERLINE}file$NORMAL $COLUMN2 Use ${UNDERLINE}file$NORMAL as the recommended file.\n
-$COLUMN1 --accepted ${UNDERLINE}file$NORMAL $COLUMN2 Use ${UNDERLINE}file$NORMAL as the accepted file.\n
+$COLUMN1 -h, --help $COLUMN2 Display this text.\n
+$COLUMN1 -m, --master ${UNDERLINE}file$NORMAL $COLUMN2 Use ${UNDERLINE}file$NORMAL as the master file.\n
+$COLUMN1 -r, --recommended ${UNDERLINE}file$NORMAL $COLUMN2 Use ${UNDERLINE}file$NORMAL as the recommended file.\n
+$COLUMN1 -a, --accepted ${UNDERLINE}file$NORMAL $COLUMN2 Use ${UNDERLINE}file$NORMAL as the accepted file.\n
 $COLUMN1 --skip-line-endings $COLUMN2 Don't correct line endings of files provided.\n
-$COLUMN1 -d, --difference 1 - 2 $COLUMN2 Take a difference between option 1 and option 2.\n
+$COLUMN1 -d, --difference ${UNDERLINE}1 - 2$NORMAL $COLUMN2 Take a difference between option 1 and option 2.\n
                 $COLUMN2 This will take each line in option 1 and search for a match in option 2.\n
                 $COLUMN2 Thus it does not matter if each line in option 2 contains more information\n
                 $COLUMN2 then the lines in option 1, but if no line in option 2 contains the exact text\n
@@ -36,7 +64,7 @@ $COLUMN1 -d, --difference 1 - 2 $COLUMN2 Take a difference between option 1 and 
 $COLUMN1 -c, --capitalize ${UNDERLINE}file$NORMAL $COLUMN2 Goes through the provided ${UNDERLINE}file$NORMAL and capitalizes the beginning\n
                 $COLUMN2 of EACH word, so it is important that this option be used only\n
                 $COLUMN2 on files that contain lists of names.\n
-$COLUMN1 -m, --match ${UNDERLINE}file$NORMAL $COLUMN2 File to use to print matching lines, if an appropriate operation\n
+$COLUMN1 --match ${UNDERLINE}file$NORMAL $COLUMN2 File to use to print matching lines, if an appropriate operation\n
                 $COLUMN2 is given.\n
 $COLUMN1 -n, --no-match ${UNDERLINE}file$NORMAL $COLUMN2 File to use to print unmatching lines, if an appropriate operation\n
                 $COLUMN2 is given.\n
@@ -111,11 +139,11 @@ for opt in $@; do
         if [[ $opt == "-h" || $opt == "--help" ]]; then 
                 echo -e $HELP_MESSAGE
                 exit 0;
-        elif [[ $opt == "--master" ]]; then
+        elif [[ $opt == "--master" || $opt == "-m"  ]]; then
                 MASTER_FLAG=1
-        elif [[ $opt == "--accepted" ]]; then 
+        elif [[ $opt == "--accepted" || $opt == "-a" ]]; then 
                 ACCEPTED_FLAG=1
-        elif [[ $opt == "--recommended" ]]; then 
+        elif [[ $opt == "--recommended" || $opt == "-r" ]]; then 
                 RECOMMENDED_FLAG=1
         elif [[ $opt == "--skip-line-endings" ]]; then
                 SKIP_LINE_ENDING_CHECK=1
@@ -123,7 +151,7 @@ for opt in $@; do
                 DIFFERENCE_FLAG=1
                 ACTIONS[$POS]="diff"
                 POS=$(($POS + 1))
-        elif [[ $opt == "--match" || $opt == "-m" ]]; then 
+        elif [[ $opt == "--match" ]]; then 
                 MATCH_FLAG=1
         elif [[ $opt == "--no-match" || $opt == "-n" ]]; then 
                 NO_MATCH_FLAG=1
@@ -223,3 +251,26 @@ done
 
 echo "Running clean up..."
 clean_up
+
+
+# Copyright 2024 Braden Carlson
+#
+# Permission is hereby granted, free of charge, to any person obtaining 
+# a copy of this software and associated documentation files (the 
+# “Software”), to deal in the Software without restriction, including 
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, 
+# and to permit persons to whom the Software is furnished to do 
+# so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be 
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+# FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
+# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
+# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
