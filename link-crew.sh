@@ -34,6 +34,8 @@ COLUMN1="\033[100D\033[3C"
 COLUMN2="\033[100D\033[30C"
 COLUMN3="\033[100D\033[35C"
 COLUMN4="\033[100D\033[40C"
+
+# What to display when help is requested. 
 HELP_MESSAGE="This is $SCRIPT_NAME v$VERSION\n\n
 Usage: $SCRIPT_NAME [options]\n
 \n
@@ -80,6 +82,7 @@ NO_MATCH_FILE=""
 MATCH_FILE=""
 CAPITALIZE_FILE=""
 
+# flags
 MASTER_FLAG=0
 ACCEPTED_FLAG=0
 RECOMMENDED_FLAG=0
@@ -91,11 +94,12 @@ CAPITALIZE_FLAG=0
 BACKUP_FLAG=0
 SKIP_LINE_ENDING_CHECK=0
 
-
+# difference arguments
 DIFF_ARG0=""
 DIFF_ARG1=""
 DIFF_SEP="-"
 
+# actions list. 
 ACTIONS=()
 POS=0
 
@@ -241,7 +245,7 @@ comparison() {
         fi
 }
 
-
+# process actions
 for action in ${ACTIONS[@]}; do
         case ${ACTIONS[@]} in
                 "diff")
@@ -251,6 +255,11 @@ for action in ${ACTIONS[@]}; do
                                 comparison $RECOMMENDED_FILE $ACCEPTED_FILE
                         elif [[ $DIFF_ARG0 == "accepted" && $DIFF_ARG1 == "recommended" ]]; then 
                                 comparison $ACCEPTED_FILE $RECOMMENDED_FILE
+                        elif [[ $DIFF_ARG0 == "recommended" && $DIFF_ARG1 == "master" ]]; then 
+                                comparison $RECOMMENDED_FILE $MASTER_FILE
+                        else 
+                                echo -e "Looks like the difference operation you requested is\nnot valid... exiting."
+                                exit 1;
                         fi
                         ;;
                 "capitalize")
@@ -262,9 +271,11 @@ for action in ${ACTIONS[@]}; do
                 
 done
 
+# clean up backups if necessary. 
 if [[ $BACKUP_FLAG == 1 ]]; then
         echo "Running clean up..."
         clean_up
+        echo "All backups can be found in the 'backups' directory."
 fi
 
 
@@ -288,4 +299,3 @@ fi
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
