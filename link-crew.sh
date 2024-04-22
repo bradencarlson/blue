@@ -1,19 +1,16 @@
 #!/bin/bash
 
-# Need to process options, 
-# this should include some file names, and 
-# what operations that need to be performed, 
-# such as 
-#    - file comparison
-#    - printing out matches 
-#    - printing out (dis?)matches
 
 SCRIPT_NAME="link-crew.sh"
 VERSION="0"
 
+# text options
 ITALIC="\033[3;80m"
 UNDERLINE="\033[4;80m"
 NORMAL="\033[0;00m"
+
+# These four control where text is printed vertically on the screen, 
+# makes life much easier than entering a bunch of tabs everywhere...
 COLUMN1="\033[100D\033[3C"
 COLUMN2="\033[100D\033[30C"
 COLUMN3="\033[100D\033[35C"
@@ -45,6 +42,8 @@ $COLUMN1 -n, --no-match ${UNDERLINE}file$NORMAL $COLUMN2 File to use to print un
                 $COLUMN2 is given.\n
 " 
 
+# files
+BACKUP_DIR="backups"
 MASTER_FILE=""
 ACCEPTED_FILE=""
 RECOMMENDED_FILE=""
@@ -152,8 +151,6 @@ test_file_exists() {
 test_file_exists $MASTER_FILE
 test_file_exists $RECOMMENDED_FILE
 test_file_exists $ACCEPTED_FILE
-test_file_exists $MATCH_FILE
-test_file_exists $NO_MATCH_FILE
 
 # strip \r from each file, to convert to unix line endings, unless
 # the --skip-line-endings option was provided. 
@@ -171,13 +168,49 @@ fix_line_endings $ACCEPTED_FILE
 ## Helper functions
 
 capitalize_names() {
-        [[ ! -z $1 ]] && [[ -f $1 ]] && sed -E 's/\<([a-z])([a-z]*)\>/\u\1\2/g' $1
+        [[ ! -z $1 ]] && [[ -f $1 ]] && sed -Ei.before_caps 's/\<([a-z])([a-z]*)\>/\u\1\2/g' $1
 }
+
+clean_up() {
+        mkdir $BACKUP_DIR 2>/dev/null
+        mv -f *.bak $BACKUP_DIR/ 2>/dev/null
+        mv -f *.before_caps $BACKUP_DIR/ 2>/dev/null
+}
+
+
+# runs a comparison between arguments $1 and $2, that is searches 
+# for each line in $1 in $2 and performs the appropriate action. 
+comparison() {
+        if  [[ -f $1 && -f $2 ]]; then 
+                while IFS= read -r line; do
+                        FOUND=$(grep "$line" < $2)
+                        if [[ -z $FOUND ]]; then 
+                                if [[ -z $NO_MATCH_FILE ]]; then 
+                                        echo $line
+                                else 
+                                        echo $line >> $NO_MATCH_FILE
+                                fi
+                        else
+                                [[ ! -z $MATCH_FILE ]] && echo $line >> $MATCH_FILE
+                        fi
+                done < $1
+        else 
+                echo "Something went wrong with the comparison... Maybe double check the file\nnames you used?\nExiting now..."
+                exit 1;
+        fi
+}
+
 
 for action in ${ACTIONS[@]}; do
         case ${ACTIONS[@]} in
                 "diff")
-
+                        if [[ $DIFF_ARG0 == "accepted" && $DIFF_ARG1 == "master" ]]; then
+                                comparison $ACCEPTED_FILE $MASTER_FILE
+                        elif [[ $DIFF_ARG0 == "recommended" && $DIFF_ARG1 == "accepted" ]]; then 
+                                comparison $RECOMMENDED_FILE $ACCEPTED_FILE
+                        elif [[ $DIFF_ARG0 == "accepted" && $DIFF_ARG1 == "recommended" ]]; then 
+                                comparison $ACCEPTED_FILE $RECOMMENDED_FILE
+                        fi
                         ;;
                 "capitalize")
                         capitalize_names $CAPITALIZE_FILE
@@ -187,3 +220,6 @@ for action in ${ACTIONS[@]}; do
         esac
                 
 done
+
+echo "Running clean up..."
+clean_up
