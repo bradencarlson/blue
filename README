@@ -2,9 +2,40 @@ link-crew.sh
 
 Written By: Braden Carlson
 
+DESCRIPTION
+
 This script was intended to be used for the link crew 
 program at Lewiston High School, and aims to solve a few 
-data processing problems that are frequently encountered. 
+data processing problems that are frequently encountered.  
+
+EXAMPLES
+
+Use accepted.txt as the list of accepted students, recommended.txt as the 
+list of the recommended students, and find the students who are on the 
+recommended list but not on the accepted list. 
+
+    link-crew.sh -a accepted.txt -r recommended.txt -d recommended - accepted
+
+Just as the previous example, but print the MATCHING names (that is, the names 
+on recommended which are found in accepted) to the file matches.txt
+
+    link-crew.sh -a accepted.txt -r recommended.txt -d recommended - accepted --match matches.txt
+
+The --no-match option is used in the same was as the --match option, but prints the 
+names that are normally printed to the screen to the file provided. 
+
+Fix the capitalization of the list of students in the accepted.txt file. 
+
+    link-crew.sh -c accepted.txt
+
+Fix the capitalization of the list of students in the accepted.txt file, and make 
+a backup of the original.
+
+    link-crew.sh --backup -c accepted.txt
+
+or
+
+    link-crew.sh -c accepted.txt --backup
 
 
 ----------------------------------------
