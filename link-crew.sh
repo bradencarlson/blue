@@ -23,10 +23,10 @@ SCRIPT_NAME="link-crew.sh"
 VERSION="0"
 
 # text options
-ITALIC="\033[3;80m"
-UNDERLINE="\033[4;80m"
-NORMAL="\033[0;00m"
-BOLD="\033[1;80m"
+ITALIC="\e[3;0m"
+UNDERLINE="\e[4;0m"
+NORMAL="\e[0;0m"
+BOLD="\e[1;0m"
 
 # These four control where text is printed vertically on the screen, 
 # makes life much easier than entering a bunch of tabs everywhere...
