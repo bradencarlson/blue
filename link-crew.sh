@@ -28,6 +28,9 @@ UNDERLINE="\e[4;0m"
 NORMAL="\e[0;0m"
 BOLD="\e[1;0m"
 
+EMPH="\e[1;31m"
+KEYWORD="\e[1;33m"
+
 # These four control where text is printed vertically on the screen, 
 # makes life much easier than entering a bunch of tabs everywhere...
 COLUMN1="\033[100D\033[3C"
@@ -36,42 +39,44 @@ COLUMN3="\033[100D\033[35C"
 COLUMN4="\033[100D\033[40C"
 
 # What to display when help is requested. 
-HELP_MESSAGE="This is $SCRIPT_NAME v$VERSION\n\n
-Usage: $SCRIPT_NAME [options]\n
-\n
-This script is designed for use with three lists of students, namely\n
-$COLUMN1 - recommended\n
-$COLUMN1 - accepted\n
-$COLUMN1 - master\n
-The recommended and accepted lists should simply be lists of names, while\n
-the master list must contain a column which matches up with the information\n
-found in the recommended and/or accepted list, which will be used for comparing\n
-the two files and finding matches and differences. \n\n
-${BOLD}Please make sure data is clean (no extra spaces please) before using this script.${NORMAL}\n\n
-Available options:\n
-$COLUMN1 -h, --help $COLUMN2 Display this text.\n
-$COLUMN1 -m, --master ${UNDERLINE}file$NORMAL $COLUMN2 Use ${UNDERLINE}file$NORMAL as the master file.\n
-$COLUMN1 -r, --recommended ${UNDERLINE}file$NORMAL $COLUMN2 Use ${UNDERLINE}file$NORMAL as the recommended file.\n
-$COLUMN1 -a, --accepted ${UNDERLINE}file$NORMAL $COLUMN2 Use ${UNDERLINE}file$NORMAL as the accepted file.\n
-$COLUMN1 --skip-line-endings $COLUMN2 Don't correct line endings of files provided.\n
-$COLUMN1 -d, --difference ${UNDERLINE}1 - 2$NORMAL $COLUMN2 Take a difference between option 1 and option 2.\n
-                $COLUMN2 This will take each line in option 1 and search for a match in option 2.\n
-                $COLUMN2 Thus it does not matter if each line in option 2 contains more information\n
-                $COLUMN2 then the lines in option 1, but if no line in option 2 contains the exact text\n
-                $COLUMN2 in the line from option 1 this will result in a failure to match, and that line\n
-                $COLUMN2 will be saved in the ${ITALIC}--no-match$NORMAL file if provided, otherwise, they will be\n
-                $COLUMN2 printed to the screen.\n
-                $COLUMN3 options 1 and 2 may be any of the following:\n
-                $COLUMN4 accepted, master, recommended.\n
-$COLUMN1 -c, --capitalize ${UNDERLINE}file$NORMAL $COLUMN2 Goes through the provided ${UNDERLINE}file$NORMAL and capitalizes the beginning\n
-                $COLUMN2 of EACH word, so it is important that this option be used only\n
-                $COLUMN2 on files that contain lists of names.\n
-$COLUMN1 --match ${UNDERLINE}file$NORMAL $COLUMN2 File to use to print matching lines, if an appropriate operation\n
-                $COLUMN2 is given.\n
-$COLUMN1 -n, --no-match ${UNDERLINE}file$NORMAL $COLUMN2 File to use to print unmatching lines, if an appropriate operation\n
-                $COLUMN2 is given.\n
-$COLUMN1 --backup $COLUMN2 Backup all files before changing them in any way.\n 
-" 
+HELP_MESSAGE="""This is $SCRIPT_NAME v$VERSION\n
+Usage: $SCRIPT_NAME [options]
+
+This script is designed for use with three lists of students, namely
+$COLUMN1 - recommended
+$COLUMN1 - accepted
+$COLUMN1 - master
+The recommended and accepted lists should simply be lists of names, while
+the master list must contain a column which matches up with the information
+found in the recommended and/or accepted list, which will be used for comparing
+the two files and finding matches and differences.\n
+${EMPH}Please make sure data is clean (no extra spaces please) before using this script.${NORMAL}\n
+This script can perform a few data cleaning tasks, such as correcting line endings to UNIX style, 
+and capitalizing the first letter of each word (useful for the accepted and recommended lists).\n
+Available options:
+$COLUMN1 -h, --help $COLUMN2 Display this text.
+$COLUMN1 -m, --master ${KEYWORD}file$NORMAL $COLUMN2 Use ${KEYWORD}file$NORMAL as the master file.
+$COLUMN1 -r, --recommended ${KEYWORD}file$NORMAL $COLUMN2 Use ${KEYWORD}file$NORMAL as the recommended file.
+$COLUMN1 -a, --accepted ${KEYWORD}file$NORMAL $COLUMN2 Use ${KEYWORD}file$NORMAL as the accepted file.
+$COLUMN1 --skip-line-endings $COLUMN2 Don't correct line endings of files provided.
+$COLUMN1 -d, --difference ${KEYWORD}1 - 2$NORMAL $COLUMN2 Take a difference between option ${KEYWORD}1$NORMAL and option ${KEYWORD}2$NORMAL.
+                $COLUMN2 This will take each line in option ${KEYWORD}1$NORMAL and search for a match in option ${KEYWORD}2$NORMAL.
+                $COLUMN2 Thus it does not matter if each line in option ${KEYWORD}2$NORMAL contains more information
+                $COLUMN2 then the lines in option 1, but if no line in option ${KEYWORD}2$NORMAL contains the exact text
+                $COLUMN2 in the line from option ${KEYWORD}1$NORMAL this will result in a failure to match, and that line
+                $COLUMN2 will be saved in the ${ITALIC}--no-match$NORMAL file if provided, otherwise, they will be
+                $COLUMN2 printed to the screen.
+                $COLUMN3 options ${KEYWORD}1$NORMAL and ${KEYWORD}2$NORMAL may be any of the following:
+                $COLUMN4 accepted, master, recommended.
+$COLUMN1 -c, --capitalize ${KEYWORD}file$NORMAL $COLUMN2 Goes through the provided ${KEYWORD}file$NORMAL and capitalizes the beginning
+                $COLUMN2 of ${EMPH}EACH$NORMAL word, so it is important that this option be used only
+                $COLUMN2 on files that contain lists of names.
+$COLUMN1 --match ${KEYWORD}file$NORMAL $COLUMN2 File to use to print matching lines, if an appropriate operation
+                $COLUMN2 is given.
+$COLUMN1 -n, --no-match ${KEYWORD}file$NORMAL $COLUMN2 File to use to print unmatching lines, if an appropriate operation
+                $COLUMN2 is given.
+$COLUMN1 --backup $COLUMN2 Backup all files before changing them in any way. 
+""" 
 
 # files
 BACKUP_DIR="backups"
@@ -144,7 +149,7 @@ for opt in $@; do
 
         # process other options
         if [[ $opt == "-h" || $opt == "--help" ]]; then 
-                echo -e $HELP_MESSAGE
+                printf "$HELP_MESSAGE"
                 exit 0;
         elif [[ $opt == "--master" || $opt == "-m"  ]]; then
                 MASTER_FLAG=1
