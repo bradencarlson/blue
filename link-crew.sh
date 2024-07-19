@@ -4,6 +4,9 @@
 # Written By: Braden Carlson 
 # Date: April 2024
 #
+# You should have received a copy of the README file along with this script. 
+# Please read over it for a full description and some examples. 
+#
 # This script was written for use in the link crew program, to solve the
 # task of taking a list of students who had been accepted as link crew leaders 
 # and comparing it to a list of students who had been recommended by faculty. 
