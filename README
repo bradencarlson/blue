@@ -4,9 +4,26 @@ Written By: Braden Carlson
 
 DESCRIPTION
 
-This script was intended to be used for the link crew 
-program at Lewiston High School, and aims to solve a few 
-data processing problems that are frequently encountered.  
+    This script was intended to be used for the link crew program at Lewiston High School, and 
+aims to solve a few data processing problems that are frequently encountered.  
+
+    The main problem that this script solves is as follows.  There exists some master list
+of students attending the school, which contains other information about each student,
+such as their home room teacher and classroom, parent's email, grade, etc. Then there is
+also another file (which I have typically called the accepted and recommended files) of
+students who have either been recommeded for the program or already accepted. The task is
+to take the list of recommended students and search for their name in the master file.
+This serves two purposes, we can then obtain their parents email and any other information
+about the student from the master file, and any names that are not found in the master
+list are the only ones that need to be done by hand. 
+
+    Since this is the main task that needs to be performed, any lists of names (such as
+recommeded and accepted files) should be cleaned before being compared with with the
+master file. This means that lists of names should not contain extra spaces, and all names
+should properly captilalized.  The spacing problem needs to be handled with some other
+tool (I prefer sed!). This script does provide a method to fix capitalization mistakes in
+a file. The way this is done is the script capitalizes every word in the file, so this
+should only be done on lists which only contain names.  
 
 EXAMPLES
 
