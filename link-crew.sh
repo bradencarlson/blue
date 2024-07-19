@@ -218,9 +218,9 @@ fix_line_endings $ACCEPTED_FILE
 
 capitalize_names() {
         if [[ $BACKUP_FLAG == 1 ]]; then
-                [[ ! -z $1 ]] && [[ -f $1 ]] && sed -Ei.before_caps 's/\<([a-z])([a-z]*)\>/\u\1\2/g' $1
+                [[ ! -z $1 ]] && [[ -f $1 ]] && sed -Ei.before_caps 's/\<([a-z])([a-zA-Z]*)\>/\u\1\L\2/g' $1
         else 
-                [[ ! -z $1 ]] && [[ -f $1 ]] && sed -E -i 's/\<([a-z])([a-z]*)\>/\u\1\2/g' $1
+                [[ ! -z $1 ]] && [[ -f $1 ]] && sed -E -i 's/\<([a-z])([a-zA-Z]*)\>/\u\1\L\2/g' $1
         fi
 }
 
