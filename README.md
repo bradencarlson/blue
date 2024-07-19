@@ -1,9 +1,9 @@
 # DESCRIPTION
 
-    This script was intended to be used for the link crew program at Lewiston High School, and 
+This script was intended to be used for the link crew program at Lewiston High School, and 
 aims to solve a few data processing problems that are frequently encountered.  
 
-    The main problem that this script solves is as follows.  There exists some master list
+The main problem that this script solves is as follows.  There exists some master list
 of students attending the school, which contains other information about each student,
 such as their home room teacher and classroom, parent's email, grade, etc. Then there is
 also another file (which I have typically called the accepted and recommended files) of
@@ -13,7 +13,7 @@ This serves two purposes, we can then obtain their parents email and any other i
 about the student from the master file, and any names that are not found in the master
 list are the only ones that need to be done by hand. 
 
-    Since this is the main task that needs to be performed, any lists of names (such as
+Since this is the main task that needs to be performed, any lists of names (such as
 recommeded and accepted files) should be cleaned before being compared with with the
 master file. This means that lists of names should not contain extra spaces, and all names
 should properly captilalized.  The spacing problem needs to be handled with some other
@@ -27,28 +27,28 @@ Use accepted.txt as the list of accepted students, recommended.txt as the
 list of the recommended students, and find the students who are on the 
 recommended list but not on the accepted list. 
 
-    link-crew.sh -a accepted.txt -r recommended.txt -d recommended - accepted
+> link-crew.sh -a accepted.txt -r recommended.txt -d recommended - accepted
 
 Just as the previous example, but print the MATCHING names (that is, the names 
 on recommended which are found in accepted) to the file matches.txt
 
-    link-crew.sh -a accepted.txt -r recommended.txt -d recommended - accepted --match matches.txt
+> link-crew.sh -a accepted.txt -r recommended.txt -d recommended - accepted --match matches.txt
 
 The --no-match option is used in the same was as the --match option, but prints the 
 names that are normally printed to the screen to the file provided. 
 
 Fix the capitalization of the list of students in the accepted.txt file. 
 
-    link-crew.sh -c accepted.txt
+> link-crew.sh -c accepted.txt
 
 Fix the capitalization of the list of students in the accepted.txt file, and make 
 a backup of the original.
 
-    link-crew.sh --backup -c accepted.txt
+> link-crew.sh --backup -c accepted.txt
 
 or
 
-    link-crew.sh -c accepted.txt --backup
+> link-crew.sh -c accepted.txt --backup
 
 
 ----------------------------------------
