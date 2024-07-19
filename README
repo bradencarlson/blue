@@ -1,8 +1,4 @@
-link-crew.sh
-
-Written By: Braden Carlson
-
-DESCRIPTION
+#DESCRIPTION
 
     This script was intended to be used for the link crew program at Lewiston High School, and 
 aims to solve a few data processing problems that are frequently encountered.  
@@ -25,7 +21,7 @@ tool (I prefer sed!). This script does provide a method to fix capitalization mi
 a file. The way this is done is the script capitalizes every word in the file, so this
 should only be done on lists which only contain names.  
 
-EXAMPLES
+#EXAMPLES
 
 Use accepted.txt as the list of accepted students, recommended.txt as the 
 list of the recommended students, and find the students who are on the 
