@@ -236,6 +236,7 @@ clean_up() {
 comparison() {
         if  [[ -f $1 && -f $2 ]]; then 
                 while IFS= read -r line; do
+                        line=$(echo $line | sed 's/\r//g; s/\n//g')
                         FOUND=$(grep "$line" < $2)
                         if [[ -z $FOUND ]]; then 
                                 if [[ -z $NO_MATCH_FILE ]]; then 
