@@ -2,3 +2,4 @@
 *.txt
 *.csv
 backups/*
+__pycache__/*
