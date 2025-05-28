@@ -53,4 +53,8 @@ def createMessageArea(master):
     txt.grid(row=0, column=0, sticky="E")
     return [frm,txt]
 
-    
+def createTab(master,tabtype="text"):
+    frm = Frame(master)
+    [file_frame, text_box] = createFileArea(frm)
+    file_frame.grid(row=0,column=0)
+

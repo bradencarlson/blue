@@ -25,19 +25,14 @@ class App(ttk.Frame):
         # and save files. 
         frm = createLogo(master)
         [fileArea, text1] = createFileArea(master)
-        btn = ttk.Button(frm, text="Open File", 
-                         command=partial(self.open_file, "NONE",textbox=text1))
-        btn.grid(row=0, column=1)
 
-        save_btn = ttk.Button(frm, text="Save File", 
-                              command=partial(self.save_file,textbox=text1))
-        save_btn.grid(row=0,column=2)
         frm.grid(row=0,column=0,sticky="W")
 
         fileArea.grid(row=1, column=0,sticky="W")
 
         [messageArea,self.message_textbox] = createMessageArea(master)
         messageArea.grid(row=2,column=0,sticky="E")
+
 
         
 
