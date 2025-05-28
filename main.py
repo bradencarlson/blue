@@ -7,7 +7,12 @@ from graphic_elements import *
 class App(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
-        createMenubar(master)
+
+        # define menu dictionary for the top of the window
+        menu_dict = {"File": {"New": partial(self.log,"New clicked"), 
+                              "Open": partial(self.log, "Open clicked")}};
+
+        createMenubar(master, menu_dict)
         frm = createLogo(master)
         [fileArea, text] = createFileArea(master)
         btn = ttk.Button(frm, text="Open File", 

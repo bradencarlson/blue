@@ -1,14 +1,30 @@
 from tkinter import *
 from tkinter import ttk
 
-# Creates the menubar which sits at the top of the screen. 
-def createMenubar(master):
+# Creates the menubar which sits at the top of the screen. The menu dictionary
+# which is passed to this method should have a top level menu item as the key,
+# then a dictionary as the value, the keys of which are labels, and values
+# commands to be run. For example: 
+# 
+# to generate the menu 
+# File
+#   New -> new_function
+#   Open -> open_function
+#
+# the following should be passed:
+#
+# {"File": {"New": new_function, "Open": open_function}}
+#
+def createMenubar(master, menu_dict):
     menu = Menu(master);
-    file = Menu(menu, tearoff=0)
-    file.add_command(label="Open", command = None)
-    file.add_command(label="New", command = None)
-    menu.add_cascade(label="File", menu = file)
-    master.config(menu = menu)
+    for (text, submenu_dict) in menu_dict.items():
+        submenu = Menu(menu,tearoff=0);
+        for (submenu_label,submenu_command) in submenu_dict.items():
+            print(f"Adding {submenu_label} to {text}")
+            submenu.add_command(label=str(submenu_label),
+                                command=submenu_command)
+        menu.add_cascade(label=str(text), menu = submenu)
+    master.config(menu=menu)
 
 # Creates a frame which holds the logo for the application. This 
 # is meant to be used as the first row of the main application. 
