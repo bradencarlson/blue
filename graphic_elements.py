@@ -20,7 +20,6 @@ def createMenubar(master, menu_dict):
     for (text, submenu_dict) in menu_dict.items():
         submenu = Menu(menu,tearoff=0);
         for (submenu_label,submenu_command) in submenu_dict.items():
-            print(f"Adding {submenu_label} to {text}")
             submenu.add_command(label=str(submenu_label),
                                 command=submenu_command)
         menu.add_cascade(label=str(text), menu = submenu)
@@ -34,7 +33,7 @@ def createLogo(master):
     # Add a label in the top left of this frame. 
     lbl = ttk.Label(frm, padding=10, text="Welcome", foreground="Red",
                     font="Monospace 17", justify="left")
-    lbl.grid(row=0,column=0,sticky="E");
+    lbl.grid(row=0,column=0);
 
     return frm
 
@@ -47,3 +46,8 @@ def createFileArea(master):
     txt = Text(frm, width="40")
     txt.grid(row=0,column=0)
     return [frm, txt]
+
+def createMessageArea(master):
+    frm = Frame(master)
+
+    
