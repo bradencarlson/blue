@@ -10,6 +10,8 @@ class App(ttk.Frame):
     def __init__(self, master):
         super().__init__(master)
         self.current_filename = ""
+        self.current_message = "sample message"
+        self.message_textbox = None
 
         # define menu dictionary for the top of the window
         menu_dict = {"File": {"New": partial(self.log,"New clicked"), 
@@ -18,6 +20,9 @@ class App(ttk.Frame):
                               "Paste": partial(self.log,"Paste clicked")}};
         createMenubar(master, menu_dict)
 
+        # Create the logo line, and the file area, 
+        # and add two buttons to it (for now), which open
+        # and save files. 
         frm = createLogo(master)
         [fileArea, text1] = createFileArea(master)
         btn = ttk.Button(frm, text="Open File", 
@@ -28,7 +33,11 @@ class App(ttk.Frame):
                               command=partial(self.save_file,textbox=text1))
         save_btn.grid(row=0,column=2)
         frm.grid(row=0,column=0,sticky="W")
-        fileArea.grid(row=1, column=0)
+
+        fileArea.grid(row=1, column=0,sticky="W")
+
+        [messageArea,self.message_textbox] = createMessageArea(master)
+        messageArea.grid(row=2,column=0,sticky="E")
 
         
 
@@ -65,13 +74,20 @@ class App(ttk.Frame):
                 self.log("Something still went wrong with new filename\n Aborting...")
                 return
 
-        f_handle.write(textbox.get(1.0,END));
+        try:
+            f_handle.write(textbox.get(1.0,END));
+        except:
+            self.log("Something went wrong writing to file.")
+            return
+        self.sendMessage("Save successful.")
 
 
     def log(self, msg):
         print(msg)
 
         
+    def sendMessage(self, msg):
+        self.message_textbox.config(text=msg)
             
         
 

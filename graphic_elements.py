@@ -49,5 +49,8 @@ def createFileArea(master):
 
 def createMessageArea(master):
     frm = Frame(master)
+    txt = ttk.Label(frm)
+    txt.grid(row=0, column=0, sticky="E")
+    return [frm,txt]
 
     
