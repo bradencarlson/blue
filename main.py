@@ -13,26 +13,13 @@ class App(ttk.Frame):
         self.current_message = "sample message"
         self.message_textbox = None
 
-        # define menu dictionary for the top of the window
-        menu_dict = {"File": {"New": partial(self.log,"New clicked"), 
-                              "Open": partial(self.log, "Open clicked")},
-                     "Edit": {"Copy": partial(self.log, "Copy clicked"),
-                              "Paste": partial(self.log,"Paste clicked")}};
-        createMenubar(master, menu_dict)
 
-        # Create the logo line, and the file area, 
-        # and add two buttons to it (for now), which open
-        # and save files. 
-        frm = createLogo(master)
-        [fileArea, text1] = createFileArea(master)
+        notebook = LinkNotebook(master)
+        notebook.addTab("hi")
 
-        frm.grid(row=0,column=0,sticky="W")
-
-        fileArea.grid(row=1, column=0,sticky="W")
-
-        [messageArea,self.message_textbox] = createMessageArea(master)
-        messageArea.grid(row=2,column=0,sticky="E")
-
+        new_menu = {"Operations": {"Close": root.quit}}
+        notebook.addTab("hello", new_menu)
+        notebook.grid(row=0, column=0)
 
         
 
