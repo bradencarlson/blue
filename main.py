@@ -4,7 +4,7 @@ from tkinter import filedialog
 from functools import partial
 from graphic_elements import *
 
-class App(ttk.Frame):
+class Link(ttk.Frame):
 
 
     def __init__(self, master):
@@ -15,10 +15,10 @@ class App(ttk.Frame):
 
 
         notebook = LinkNotebook(master)
-        notebook.addTab("hi")
+        notebook.addTab(kind="TextTab", text="hi")
 
         new_menu = {"Operations": {"Close": root.quit}}
-        notebook.addTab("hello", new_menu)
+        notebook.addTab(kind="TextTab", text="hello", menu=new_menu)
         notebook.grid(row=0, column=0)
 
         
@@ -75,5 +75,5 @@ class App(ttk.Frame):
 
 
 root = Tk()
-app = App(root)
+app = Link(root)
 root.mainloop()
