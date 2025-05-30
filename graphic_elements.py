@@ -54,6 +54,12 @@ class LinkNotebook(ttk.Notebook):
                     self.add(newTab, text=kwargs['text'])
                 except KeyError:
                     self.add(newTab, "New Tab")
+            elif kwargs['kind'] == "OperationTab":
+                newTab = OperationTab(self,**kwargs)
+                try:
+                    self.add(newTab, text=kwargs['text'])
+                except KeyError:
+                    self.add(newTab, "New Tab")
         except KeyError as e:
            fatal(e) 
 
@@ -190,6 +196,18 @@ class TextTab(LinkTab):
             log(f"Something went wrong trying to save {self.filename}")
             return
         f_handle.write(self.textarea.get(1.0, "end"))
+
+class OperationTab(LinkTab):
+    def __init__(self,master, **kwargs):
+
+        ops_menu = {'Comparison': {
+            'close': exit}}
+        super().__init__(master,**kwargs,menu=ops_menu)
+
+    # This should take the output of what ever command has been run and save it
+    # to a file.
+    def save_file(self):
+        return
 
 def createMessageArea(master):
     frm = Frame(master)
