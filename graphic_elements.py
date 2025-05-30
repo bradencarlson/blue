@@ -145,7 +145,8 @@ class TextTab(LinkTab):
         self.filename = StringVar()
         self.textarea = None
 
-        # start counting rows at 1, since the menu is at row 0
+        # start counting rows at 1, since the menu (placed by
+        # super().__init__() ) is at row 0.
         self.row_counter = 1
 
         self.createFilenameLabel()
@@ -163,9 +164,15 @@ class TextTab(LinkTab):
         txt = Text(self)
         txt.grid(row=self.row_counter,column=0,sticky="NSEW")
         self.row_counter = self.row_counter + 1
+
+        # Bind this textbox to the <<Modified>> event, which will call the 
+        # on_modified method, so that a * is added to the filename label.
         txt.bind("<<Modified>>", self.on_modified)
         return txt
 
+    # Creates a label which will contain the current value of the filename_label
+    # variable. This will be used to remind the user which file is open, as well
+    # as notify them when there are unsaved changes. 
     def createFilenameLabel(self):
         lbl = ttk.Label(self, textvariable=self.filename_label)
         lbl.grid(row=self.row_counter,column=0,sticky="W")
@@ -182,16 +189,25 @@ class TextTab(LinkTab):
             return
         self.textarea.delete(1.0,"end")
         self.textarea.insert(1.0, f_handle.read())
+
+        # Set the filename_label variable. 
         temp_filename = f_handle.name
         # TODO: This assumes unix style path names and is thus not very
         # portable.  
         temp_filename = re.sub(r"(.*)/([^/]*)$",r'\2', temp_filename)
         self.filename_label.set(temp_filename)
+
+        # Set the current filename to be the full path of the file
         self.filename.set(f_handle.name)
 
+        # Since we just opened a new file, make sure that the edit_modified flag
+        # is turned off so there is no * next to the file name. 
         self.textarea.edit_modified(False)
 
-    def on_modified(self,event):
+    # Method to call when the textbox on this tab is modified. It simply takes
+    # the curent filename_label and adds a * to the end, if there is not one
+    # already. 
+    def on_modified(self, event):
         if self.textarea.edit_modified():
             if not self.filename_label.get().endswith("*"):
                 self.filename_label.set(self.filename_label.get() + "*")
@@ -212,6 +228,7 @@ class TextTab(LinkTab):
 class OperationTab(LinkTab):
     def __init__(self,master, **kwargs):
 
+        # Define the menu for the OperationTab. 
         ops_menu = {'Comparison': {
             'close': exit}}
         super().__init__(master,**kwargs,menu=ops_menu)
@@ -220,15 +237,3 @@ class OperationTab(LinkTab):
     # to a file.
     def save_file(self):
         return
-
-def createMessageArea(master):
-    frm = Frame(master)
-    txt = ttk.Label(frm)
-    txt.grid(row=0, column=0, sticky="E")
-    return [frm,txt]
-
-def createTab(master,tabtype="text"):
-    frm = Frame(master)
-    [file_frame, text_box] = createFileArea(frm)
-    file_frame.grid(row=0,column=0)
-
