@@ -30,6 +30,7 @@ from tkinter import ttk
 from tkinter import filedialog
 from functools import partial
 from logging import log
+import re
 
 class LinkNotebook(ttk.Notebook):
     def __init__(self, master):
@@ -173,7 +174,12 @@ class TextTab(LinkTab):
             return
         self.textarea.delete(1.0,"end")
         self.textarea.insert(1.0, f_handle.read())
-        self.filename.set(f_handle.name)
+        temp_filename = f_handle.name
+        # TODO: This assumes unix style path names and is thus not very
+        # portable.  
+        temp_filename = re.sub(r"(.*)/([^/]*)$",r'\2', temp_filename)
+        print(temp_filename)
+        self.filename.set(temp_filename)
 
     # Saves the file.  This is as simple as using the current filename (from
     # open_file) and writing the text from the textarea to it. 
