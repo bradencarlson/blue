@@ -140,8 +140,9 @@ class TextTab(LinkTab):
     #   textwidth - width of the text box. Default is "100". 
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+        self.filename_label = StringVar()
+        self.filename_label.set("New File")
         self.filename = StringVar()
-        self.filename.set("New File")
         self.textarea = None
 
         # start counting rows at 1, since the menu is at row 0
@@ -162,10 +163,11 @@ class TextTab(LinkTab):
         txt = Text(self)
         txt.grid(row=self.row_counter,column=0,sticky="NSEW")
         self.row_counter = self.row_counter + 1
+        txt.bind("<<Modified>>", self.on_modified)
         return txt
 
     def createFilenameLabel(self):
-        lbl = ttk.Label(self, textvariable=self.filename)
+        lbl = ttk.Label(self, textvariable=self.filename_label)
         lbl.grid(row=self.row_counter,column=0,sticky="W")
         self.row_counter = self.row_counter + 1
 
@@ -184,17 +186,27 @@ class TextTab(LinkTab):
         # TODO: This assumes unix style path names and is thus not very
         # portable.  
         temp_filename = re.sub(r"(.*)/([^/]*)$",r'\2', temp_filename)
-        print(temp_filename)
-        self.filename.set(temp_filename)
+        self.filename_label.set(temp_filename)
+        self.filename.set(f_handle.name)
+
+        self.textarea.edit_modified(False)
+
+    def on_modified(self,event):
+        if self.textarea.edit_modified():
+            if not self.filename_label.get().endswith("*"):
+                self.filename_label.set(self.filename_label.get() + "*")
 
     # Saves the file.  This is as simple as using the current filename (from
     # open_file) and writing the text from the textarea to it. 
     def save_file(self):
         try:
             f_handle = open(self.filename.get(), "w")
-        except: 
+        except Exception as e: 
             log(f"Something went wrong trying to save {self.filename}")
+            print(e)
             return
+        self.textarea.edit_modified(False)
+        self.filename_label.set(re.sub(r"(.*)\*$",r"\1",self.filename_label.get()))
         f_handle.write(self.textarea.get(1.0, "end"))
 
 class OperationTab(LinkTab):
