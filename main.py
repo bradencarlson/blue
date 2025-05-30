@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import filedialog
 from functools import partial
 from graphic_elements import *
 
@@ -20,22 +19,6 @@ class Link(ttk.Frame):
 
         
 
-    def open_file(self, filename, permissions="r", textbox= None):
-        if filename == "NONE":
-            filename = filedialog.askopenfilename()
-
-        try:
-            f_handle = open(filename, permissions)
-            self.current_filename = filename
-            if textbox != None:
-                content = f_handle.read()
-                textbox.delete(1.0,END)
-                textbox.insert(1.0, content)
-        except Exception as e:
-            self.log(f"There was an error opening {filename}")
-            self.log(e)
-            return
-        return f_handle
 
     def save_file(self, textbox = None):
         if textbox==None:

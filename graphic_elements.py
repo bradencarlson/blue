@@ -27,6 +27,7 @@
 
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog
 from functools import partial
 from logging import log
 
@@ -65,7 +66,7 @@ class LinkTab(Frame):
         
         # define default menu dictionary for the top of the frame
         default_menu_dict = {"File": {"New": partial(log,f"New clicked {self}"), 
-                              "Open": partial(log, "Open clicked")},
+                              "Open": partial(self.open_file,"NONE", "r")},
                      "Edit": {"Copy": partial(log, "Copy clicked"),
                               "Paste": partial(log,"Paste clicked")}};
         try:
@@ -103,6 +104,20 @@ class LinkTab(Frame):
             pos = pos + 1
         return menu
 
+    # Opens a file for editing, if there is any error in opening the file, a
+    # dialog is opened and the user is asked to select a file for opening. 
+    def open_file(self, filename, permissions="r"):
+        f_handle = 0;
+        while not f_handle:
+            try:
+                f_handle = open(filename,permissions)
+            except Exception as e: 
+                log(f"{e}")
+                log("Asking user to select a file.")
+                filename = filedialog.askopenfilename()
+        return f_handle
+
+
 class TextTab(LinkTab):
     # Constructor for TextTab, see constructor for LinkTab for keywords
     # pertaining to the Tab structure. Keywords specific to the TextTab are:
@@ -111,6 +126,7 @@ class TextTab(LinkTab):
         super().__init__(master, **kwargs)
         self.filename = StringVar()
         self.filename.set("New File")
+        self.textarea = None
 
         # start counting rows at 1, since the menu is at row 0
         self.row_counter = 1
@@ -118,9 +134,9 @@ class TextTab(LinkTab):
         self.createFilenameLabel()
 
         try:
-            self.createFileArea(kwargs['textwidth'])
+            self.textarea = self.createFileArea(kwargs['textwidth'])
         except KeyError: 
-            self.createFileArea()
+            self.textarea = self.createFileArea()
         super().grid_rowconfigure(self.row_counter - 1, weight=1)
 
     # Creates an area where text can be displayed.  Returns both a reference to the
@@ -130,11 +146,16 @@ class TextTab(LinkTab):
         txt = Text(self)
         txt.grid(row=self.row_counter,column=0,sticky="NSEW")
         self.row_counter = self.row_counter + 1
+        return txt
 
     def createFilenameLabel(self):
         lbl = ttk.Label(self, textvariable=self.filename)
         lbl.grid(row=self.row_counter,column=0,sticky="W")
         self.row_counter = self.row_counter + 1
+
+    def open_file(self, filename, permissions="r"):
+        f_handle = super().open_file(filename, permissions)
+        self.textarea.insert(1.0, f_handle.read())
 
 def createMessageArea(master):
     frm = Frame(master)
