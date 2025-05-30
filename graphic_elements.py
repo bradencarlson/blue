@@ -66,7 +66,8 @@ class LinkTab(Frame):
         
         # define default menu dictionary for the top of the frame
         default_menu_dict = {"File": {"New": partial(log,f"New clicked {self}"), 
-                              "Open": partial(self.open_file,"NONE", "r")},
+                              "Open": partial(self.open_file,"NONE", "r+"),
+                              "Save": self.save_file},
                      "Edit": {"Copy": partial(log, "Copy clicked"),
                               "Paste": partial(log,"Paste clicked")}};
         try:
@@ -120,6 +121,11 @@ class LinkTab(Frame):
                     return ''
         return f_handle
 
+    # to be implemented by child. 
+    def save_file(self, filename, textarea):
+        return
+
+
 
 class TextTab(LinkTab):
     # Constructor for TextTab, see constructor for LinkTab for keywords
@@ -156,12 +162,28 @@ class TextTab(LinkTab):
         lbl.grid(row=self.row_counter,column=0,sticky="W")
         self.row_counter = self.row_counter + 1
 
+    # Opens a file in the TextTab's textarea. The way this is done is by passing
+    # the actual open operation to the parent, then simply loading the text into
+    # the textbox is the user made a choice of which file to open.  If the user
+    # did not choose a file (i.e. they pressed the cancel button) this method
+    # returns nothing and stops. 
     def open_file(self, filename, permissions="r"):
         f_handle = super().open_file(filename, permissions)
         if f_handle == '':
             return
         self.textarea.delete(1.0,"end")
         self.textarea.insert(1.0, f_handle.read())
+        self.filename.set(f_handle.name)
+
+    # Saves the file.  This is as simple as using the current filename (from
+    # open_file) and writing the text from the textarea to it. 
+    def save_file(self):
+        try:
+            f_handle = open(self.filename.get(), "w")
+        except: 
+            log(f"Something went wrong trying to save {self.filename}")
+            return
+        f_handle.write(self.textarea.get(1.0, "end"))
 
 def createMessageArea(master):
     frm = Frame(master)
