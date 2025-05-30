@@ -61,6 +61,7 @@ class LinkTab(Frame):
     def __init__(self,master,**kwargs):
         super().__init__(master)
 
+        self.grid_columnconfigure(0,weight=1)
         
         # define default menu dictionary for the top of the frame
         default_menu_dict = {"File": {"New": partial(log,f"New clicked {self}"), 
@@ -72,7 +73,7 @@ class LinkTab(Frame):
         except KeyError:
             menu = self.createMenubar(default_menu_dict)
 
-        menu.grid(row=0, column=0,sticky="W")
+        menu.grid(row=0, column=0,sticky="ew")
 
     # Creates the menubar which sits at the top of the current tab. The menu dictionary
     # which is passed to this method should have a top level menu item as the key,
@@ -98,7 +99,7 @@ class LinkTab(Frame):
                 menuitems.add_command(label=str(submenu_label),
                                     command=submenu_command)
             submenu.config(menu=menuitems)
-            submenu.grid(row=0, column=pos)
+            submenu.grid(row=0, column=pos,sticky="EW")
             pos = pos + 1
         return menu
 
@@ -108,20 +109,32 @@ class TextTab(LinkTab):
     #   textwidth - width of the text box. Default is "100". 
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+        self.filename = StringVar()
+        self.filename.set("New File")
+
+        # start counting rows at 1, since the menu is at row 0
+        self.row_counter = 1
+
+        self.createFilenameLabel()
 
         try:
             self.createFileArea(kwargs['textwidth'])
         except KeyError: 
             self.createFileArea()
+        super().grid_rowconfigure(self.row_counter - 1, weight=1)
 
     # Creates an area where text can be displayed.  Returns both a reference to the
     # frame in which the text box is placed, as well as the text box itself, so that
     # the content of the text box can be updated from outside this function.
     def createFileArea(self, width="100"):
+        txt = Text(self)
+        txt.grid(row=self.row_counter,column=0,sticky="NSEW")
+        self.row_counter = self.row_counter + 1
 
-        txt = Text(self, width=width)
-        txt.grid(row=1,column=0)
-        return  txt
+    def createFilenameLabel(self):
+        lbl = ttk.Label(self, textvariable=self.filename)
+        lbl.grid(row=self.row_counter,column=0,sticky="W")
+        self.row_counter = self.row_counter + 1
 
 def createMessageArea(master):
     frm = Frame(master)

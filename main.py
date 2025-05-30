@@ -9,17 +9,14 @@ class Link(ttk.Frame):
 
     def __init__(self, master):
         super().__init__(master)
-        self.current_filename = ""
-        self.current_message = "sample message"
-        self.message_textbox = None
 
-
-        notebook = LinkNotebook(master)
+        notebook = LinkNotebook(self)
         notebook.addTab(kind="TextTab", text="hi")
 
         new_menu = {"Operations": {"Close": root.quit}}
         notebook.addTab(kind="TextTab", text="hello", menu=new_menu)
-        notebook.grid(row=0, column=0)
+        notebook.pack(fill="both", expand=True)
+        self.pack(fill="both", expand=True)
 
         
 
