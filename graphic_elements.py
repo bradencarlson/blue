@@ -115,6 +115,9 @@ class LinkTab(Frame):
                 log(f"{e}")
                 log("Asking user to select a file.")
                 filename = filedialog.askopenfilename()
+                # if the user selects cancel do nothing
+                if filename == '':
+                    return ''
         return f_handle
 
 
@@ -155,6 +158,9 @@ class TextTab(LinkTab):
 
     def open_file(self, filename, permissions="r"):
         f_handle = super().open_file(filename, permissions)
+        if f_handle == '':
+            return
+        self.textarea.delete(1.0,"end")
         self.textarea.insert(1.0, f_handle.read())
 
 def createMessageArea(master):
