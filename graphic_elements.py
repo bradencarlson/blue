@@ -27,7 +27,7 @@
 
 from tkinter import *
 from tkinter import ttk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from functools import partial
 from logging import log
 import re
@@ -75,6 +75,8 @@ class LinkNotebook(ttk.Notebook):
                     foreground="black",
                     padding=[10,5])
 
+# Since the default_menu_dict contains functions that are not defined in this
+# class, but a child class, these should not be initiated directly. 
 class LinkTab(ttk.Frame):
     # Constructor for LinkTab. Currently the accepted keywords are 
     #   menu -  The menu dictionary to use at the top of this tab
@@ -91,7 +93,8 @@ class LinkTab(ttk.Frame):
                                   "Open": partial(self.open_file,"NONE", "r+"),
                                   "Save": self.save_file},
                          "Edit": {"Copy": partial(log, "Copy clicked"),
-                                  "Paste": partial(log,"Paste clicked")}};
+                                  "Paste": partial(log,"Paste clicked"),
+                                  "Capitalize": self.capitalize_names}};
             menu = self.createMenubar(default_menu_dict)
 
         menu.grid(row=0, column=0,sticky="ew")
@@ -241,6 +244,8 @@ class TextTab(LinkTab):
         self.filename_label.set(re.sub(r"(.*)\*$",r"\1",self.filename_label.get()))
         f_handle.write(self.textarea.get(1.0, "end"))
 
+    # If there are unsaved changes, save them, then clear the textarea and reset
+    # the filename label so the user can start a new file. 
     def new_file(self):
         if self.textarea.edit_modified():
             self.save_file()
@@ -249,6 +254,16 @@ class TextTab(LinkTab):
         self.textarea.edit_modified(False)
         self.filename_label.set("New File")
         return
+
+    def capitalize_names(self):
+        msg = """This operation will capitalize all words in the current file. 
+        It is recommended to be used on files whose entire contents are lists of names"""
+        if not messagebox.askyesno("Are you sure?", msg):
+            return
+        content = self.textarea.get(1.0,"end")
+        content = re.sub(r"([a-zA-Z]+)",lambda m: m.group(0).capitalize(),content)
+        self.textarea.delete(1.0,"end")
+        self.textarea.insert(1.0, content)
         
 
 class OperationTab(LinkTab):
@@ -256,8 +271,8 @@ class OperationTab(LinkTab):
 
         # Define the menu for the OperationTab. This MUST be done, since if
         # there is no menu passed into the super().__init__() method, it will
-        # try to define the default menu, but this class does not have a
-        # new_file method, so it will fail. Of course, this could just be added
+        # try to define the default menu, but this class does not have some of
+        # the methods, so it will fail. Of course, these could just be added
         # and have it do nothing... we'll see.
         ops_menu = {'Comparison': {
             'close': exit}}
