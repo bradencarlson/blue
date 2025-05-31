@@ -88,13 +88,13 @@ class LinkTab(ttk.Frame):
         try:
             menu = self.createMenubar(kwargs['menu'])
         except KeyError:
-            # define default menu dictionary for the top of the frame
-            default_menu_dict = {"File": {"New": self.new_file, 
-                                  "Open": partial(self.open_file,"NONE", "r+"),
-                                  "Save": self.save_file},
+            # define default menu dictionary for the top of the frame, 
+            # which does nothing but log stuff. 
+            default_menu_dict = {"File": {"New": log('New clicked'), 
+                                  "Open": log('Open clicked.')},
                          "Edit": {"Copy": partial(log, "Copy clicked"),
-                                  "Paste": partial(log,"Paste clicked"),
-                                  "Capitalize": self.capitalize_names}};
+                                  "Paste": partial(log,"Paste clicked")
+                                  }}
             menu = self.createMenubar(default_menu_dict)
 
         menu.grid(row=0, column=0,sticky="ew")
@@ -154,7 +154,17 @@ class TextTab(LinkTab):
     # pertaining to the Tab structure. Keywords specific to the TextTab are:
     #   textwidth - width of the text box. Default is "100". 
     def __init__(self, master, **kwargs):
-        super().__init__(master, **kwargs)
+
+        # define the default menu for the TextTab
+        default_menu_dict = {"File": {"New": self.new_file, 
+                              "Open": partial(self.open_file,"NONE", "r+"),
+                              "Save": self.save_file},
+                     "Edit": {"Copy": partial(log, "Copy clicked"),
+                              "Paste": partial(log,"Paste clicked"),
+                              "Capitalize": self.capitalize_names}};
+
+        super().__init__(master, **kwargs, menu=default_menu_dict)
+
         self.filename_label = StringVar()
         self.filename_label.set("New File")
         self.filename = StringVar()
@@ -269,11 +279,7 @@ class TextTab(LinkTab):
 class OperationTab(LinkTab):
     def __init__(self,master, **kwargs):
 
-        # Define the menu for the OperationTab. This MUST be done, since if
-        # there is no menu passed into the super().__init__() method, it will
-        # try to define the default menu, but this class does not have some of
-        # the methods, so it will fail. Of course, these could just be added
-        # and have it do nothing... we'll see.
+        # Define the menu for the operations tab. 
         ops_menu = {'Comparison': {
             'close': exit}}
         super().__init__(master,**kwargs,menu=ops_menu)
