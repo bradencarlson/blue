@@ -35,6 +35,7 @@ import re
 class LinkNotebook(ttk.Notebook):
     def __init__(self, master):
         super().__init__(master)
+        self.style()
 
     def getTabs(self):
         return self.tabs()
@@ -62,8 +63,19 @@ class LinkNotebook(ttk.Notebook):
                     self.add(newTab, "New Tab")
         except KeyError as e:
            fatal(e) 
+    def style(self):
+        S = ttk.Style()
+        S.configure("TNotebook.Tab",
+                        background="darkgray",
+                        padding=[10,5])
+        S.configure("TFrame", 
+                    background="darkgray")
+        S.configure("TLabel",
+                    background="darkgray",
+                    foreground="black",
+                    padding=[10,5])
 
-class LinkTab(Frame):
+class LinkTab(ttk.Frame):
     # Constructor for LinkTab. Currently the accepted keywords are 
     #   menu -  The menu dictionary to use at the top of this tab
     def __init__(self,master,**kwargs):
