@@ -78,6 +78,8 @@ class LinkNotebook(ttk.Notebook):
 # Since the default_menu_dict contains functions that are not defined in this
 # class, but a child class, these should not be initiated directly. 
 class LinkTab(ttk.Frame):
+    menu_style = {
+            'bg': 'darkgray'}
     # Constructor for LinkTab. Currently the accepted keywords are 
     #   menu -  The menu dictionary to use at the top of this tab
     def __init__(self,master,**kwargs):
@@ -114,11 +116,11 @@ class LinkTab(ttk.Frame):
     # {"File": {"New": new_function, "Open": open_function}}
     #
     def createMenubar(self, menu_dict):
-        menu = Frame(self);
+        menu = ttk.Frame(self);
         pos = 0
         for (text, submenu_dict) in menu_dict.items():
-            submenu = Menubutton(menu,text=text);
-            menuitems = Menu(submenu, tearoff=0)
+            submenu = Menubutton(menu,text=text,**self.menu_style);
+            menuitems = Menu(submenu, tearoff=0,**self.menu_style)
             for (submenu_label,submenu_command) in submenu_dict.items():
                 menuitems.add_command(label=str(submenu_label),
                                     command=submenu_command)
@@ -158,7 +160,9 @@ class TextTab(LinkTab):
                      "Edit": {"Copy": partial(log, "Copy clicked"),
                               "Paste": partial(log,"Paste clicked"),
                               "Capitalize": self.capitalize_names,
-                              "Sort": self.sort}};
+                              "Sort": self.sort,
+                              "Undo": self.undo,
+                              "Redo": self.redo }}
 
         super().__init__(master, **kwargs, menu=default_menu_dict)
 
@@ -183,7 +187,7 @@ class TextTab(LinkTab):
     # frame in which the text box is placed, as well as the text box itself, so that
     # the content of the text box can be updated from outside this function.
     def createFileArea(self, width="100"):
-        txt = Text(self)
+        txt = Text(self, undo=True)
         txt.grid(row=self.row_counter,column=0,sticky="NSEW")
         self.row_counter = self.row_counter + 1
 
@@ -270,17 +274,34 @@ class TextTab(LinkTab):
         It is recommended to be used on files whose entire contents are lists of names"""
         if not messagebox.askyesno("Are you sure?", msg):
             return
+        
+        # mark this point as a point the user can jump back to with the Undo
+        # button
+        self.textarea.edit_separator()
+
         content = self.textarea.get(1.0,"end")
         content = re.sub(r"([a-zA-Z]+)",lambda m: m.group(0).capitalize(),content)
-        self.textarea.delete(1.0,"end")
-        self.textarea.insert(1.0, content)
+        self.textarea.replace(1.0,"end",content)
 
+    # Sort lines of the textbox
     def sort(self):
+
+        # mark this point as a point the user can jump back to with the Undo
+        # button
+        self.textarea.edit_separator()
+
         content = self.textarea.get(1.0,"end").splitlines()
         content.sort()
         content = [x for x in content if x != '']
-        self.textarea.delete(1.0,"end")
-        self.textarea.insert(1.0,"\n".join(content))
+        self.textarea.replace(1.0,"end","\n".join(content))
+
+    # Use the undo feature from the textbox. 
+    def undo(self):
+        self.textarea.edit_undo()
+
+    # Use the redo feature from the textbox. 
+    def redo(self):
+        self.textarea.edit_redo()
 
 
 
@@ -296,3 +317,4 @@ class OperationTab(LinkTab):
     # to a file.
     def save_file(self):
         return
+

@@ -51,9 +51,6 @@ class Link(ttk.Frame):
     def sendMessage(self, msg):
         self.message_textbox.config(text=msg)
             
-        
-
-
 root = Tk()
 app = Link(root)
 root.mainloop()
