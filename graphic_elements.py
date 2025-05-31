@@ -92,8 +92,8 @@ class LinkTab(ttk.Frame):
             # which does nothing but log stuff. 
             default_menu_dict = {"File": {"New": log('New clicked'), 
                                   "Open": log('Open clicked.')},
-                         "Edit": {"Copy": partial(log, "Copy clicked"),
-                                  "Paste": partial(log,"Paste clicked")
+                         "Edit": {"Copy": log("Copy clicked"),
+                                  "Paste": log("Paste clicked")
                                   }}
             menu = self.createMenubar(default_menu_dict)
 
@@ -143,10 +143,6 @@ class LinkTab(ttk.Frame):
                     return ''
         return f_handle
 
-    # to be implemented by child. 
-    def save_file(self, filename, textarea):
-        return
-
 
 
 class TextTab(LinkTab):
@@ -161,7 +157,8 @@ class TextTab(LinkTab):
                               "Save": self.save_file},
                      "Edit": {"Copy": partial(log, "Copy clicked"),
                               "Paste": partial(log,"Paste clicked"),
-                              "Capitalize": self.capitalize_names}};
+                              "Capitalize": self.capitalize_names,
+                              "Sort": self.sort}};
 
         super().__init__(master, **kwargs, menu=default_menu_dict)
 
@@ -214,6 +211,7 @@ class TextTab(LinkTab):
             return
         self.textarea.delete(1.0,"end")
         self.textarea.insert(1.0, f_handle.read())
+        self.textarea.index(1.0)
 
         # Set the filename_label variable. 
         temp_filename = f_handle.name
@@ -252,7 +250,7 @@ class TextTab(LinkTab):
             return
         self.textarea.edit_modified(False)
         self.filename_label.set(re.sub(r"(.*)\*$",r"\1",self.filename_label.get()))
-        f_handle.write(self.textarea.get(1.0, "end"))
+        f_handle.write(self.textarea.get(1.0, "end-1c"))
 
     # If there are unsaved changes, save them, then clear the textarea and reset
     # the filename label so the user can start a new file. 
@@ -265,6 +263,8 @@ class TextTab(LinkTab):
         self.filename_label.set("New File")
         return
 
+    # Capitalize each word of the current file. Send a warning to the user first
+    # confirming that this is what they want to do. 
     def capitalize_names(self):
         msg = """This operation will capitalize all words in the current file. 
         It is recommended to be used on files whose entire contents are lists of names"""
@@ -274,7 +274,15 @@ class TextTab(LinkTab):
         content = re.sub(r"([a-zA-Z]+)",lambda m: m.group(0).capitalize(),content)
         self.textarea.delete(1.0,"end")
         self.textarea.insert(1.0, content)
-        
+
+    def sort(self):
+        content = self.textarea.get(1.0,"end").splitlines()
+        content.sort()
+        content = [x for x in content if x != '']
+        self.textarea.delete(1.0,"end")
+        self.textarea.insert(1.0,"\n".join(content))
+
+
 
 class OperationTab(LinkTab):
     def __init__(self,master, **kwargs):
