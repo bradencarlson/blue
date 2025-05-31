@@ -71,15 +71,15 @@ class LinkTab(Frame):
 
         self.grid_columnconfigure(0,weight=1)
         
-        # define default menu dictionary for the top of the frame
-        default_menu_dict = {"File": {"New": partial(log,f"New clicked {self}"), 
-                              "Open": partial(self.open_file,"NONE", "r+"),
-                              "Save": self.save_file},
-                     "Edit": {"Copy": partial(log, "Copy clicked"),
-                              "Paste": partial(log,"Paste clicked")}};
         try:
             menu = self.createMenubar(kwargs['menu'])
         except KeyError:
+            # define default menu dictionary for the top of the frame
+            default_menu_dict = {"File": {"New": self.new_file, 
+                                  "Open": partial(self.open_file,"NONE", "r+"),
+                                  "Save": self.save_file},
+                         "Edit": {"Copy": partial(log, "Copy clicked"),
+                                  "Paste": partial(log,"Paste clicked")}};
             menu = self.createMenubar(default_menu_dict)
 
         menu.grid(row=0, column=0,sticky="ew")
@@ -204,6 +204,7 @@ class TextTab(LinkTab):
         # is turned off so there is no * next to the file name. 
         self.textarea.edit_modified(False)
 
+
     # Method to call when the textbox on this tab is modified. It simply takes
     # the curent filename_label and adds a * to the end, if there is not one
     # already. 
@@ -215,20 +216,37 @@ class TextTab(LinkTab):
     # Saves the file.  This is as simple as using the current filename (from
     # open_file) and writing the text from the textarea to it. 
     def save_file(self):
+        if self.filename.get() == '':
+            self.filename.set(filedialog.asksaveasfilename())
+            self.filename_label.set(re.sub(r"(.*)/([^/]*)$",r'\2',self.filename.get()))
         try:
             f_handle = open(self.filename.get(), "w")
         except Exception as e: 
             log(f"Something went wrong trying to save {self.filename}")
-            print(e)
+            log(e)
             return
         self.textarea.edit_modified(False)
         self.filename_label.set(re.sub(r"(.*)\*$",r"\1",self.filename_label.get()))
         f_handle.write(self.textarea.get(1.0, "end"))
 
+    def new_file(self):
+        if self.textarea.edit_modified():
+            self.save_file()
+        self.textarea.delete(1.0,"end")
+        self.filename.set('')
+        self.textarea.edit_modified(False)
+        self.filename_label.set("New File")
+        return
+        
+
 class OperationTab(LinkTab):
     def __init__(self,master, **kwargs):
 
-        # Define the menu for the OperationTab. 
+        # Define the menu for the OperationTab. This MUST be done, since if
+        # there is no menu passed into the super().__init__() method, it will
+        # try to define the default menu, but this class does not have a
+        # new_file method, so it will fail. Of course, this could just be added
+        # and have it do nothing... we'll see.
         ops_menu = {'Comparison': {
             'close': exit}}
         super().__init__(master,**kwargs,menu=ops_menu)
