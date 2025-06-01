@@ -41,7 +41,7 @@ class LinkNotebook(ttk.Notebook):
     def getTabs(self):
         return self.tabs()
 
-    def selectTab(self, tab_id):
+    def getTab(self, tab_id):
         return self.tab(tab_id)
 
     # Adds a tab to the notebook. Currently the accepted keywords are 
@@ -86,12 +86,7 @@ class LinkNotebook(ttk.Notebook):
 # Since the default_menu_dict contains functions that are not defined in this
 # class, but a child class, these should not be initiated directly. 
 class LinkTab(ttk.Frame):
-    menu_style = {
-            'bg': color.bg, 
-            'fg': color.fg,
-            'activebackground': color.bg_active,
-            'activeforeground': color.fg_active,
-            'bd': 0}
+
     # Constructor for LinkTab. Currently the accepted keywords are 
     #   menu -  The menu dictionary to use at the top of this tab
     def __init__(self,master,**kwargs):
@@ -131,8 +126,8 @@ class LinkTab(ttk.Frame):
         menu = ttk.Frame(self);
         pos = 0
         for (text, submenu_dict) in menu_dict.items():
-            submenu = Menubutton(menu,text=text,**self.menu_style);
-            menuitems = Menu(submenu, tearoff=0,**self.menu_style)
+            submenu = Menubutton(menu,text=text,**color.menu_style);
+            menuitems = Menu(submenu, tearoff=0,**color.menu_style)
             for (submenu_label,submenu_command) in submenu_dict.items():
                 menuitems.add_command(label=str(submenu_label),
                                     command=submenu_command)
@@ -160,12 +155,7 @@ class LinkTab(ttk.Frame):
 
 
 class TextTab(LinkTab):
-    text_style = {
-            'bg': color.bg_text,
-            'fg': color.fg_text,
-            'bd': 0,
-            'insertbackground': color.text_insert,
-            'font': "Ariel 12"}
+
     # Constructor for TextTab, see constructor for LinkTab for keywords
     # pertaining to the Tab structure. Keywords specific to the TextTab are:
     #   textwidth - width of the text box. Default is "100". 
@@ -205,7 +195,7 @@ class TextTab(LinkTab):
     # frame in which the text box is placed, as well as the text box itself, so that
     # the content of the text box can be updated from outside this function.
     def createFileArea(self, width="100"):
-        txt = Text(self, undo=True, **self.text_style)
+        txt = Text(self, undo=True, **color.text_style)
         txt.grid(row=self.row_counter,column=0,sticky="NSEW",padx=5,pady=2)
         self.row_counter = self.row_counter + 1
 
