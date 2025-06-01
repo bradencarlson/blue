@@ -30,6 +30,7 @@ from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
 from logging import log
+import colors as color
 import re
 
 class LinkNotebook(ttk.Notebook):
@@ -65,21 +66,32 @@ class LinkNotebook(ttk.Notebook):
            fatal(e) 
     def style(self):
         S = ttk.Style()
+        S.map("TNotebook.Tab",
+                    background=[('selected', color.bg)],
+                    foreground=[('selected', color.fg)])
         S.configure("TNotebook.Tab",
-                        background="darkgray",
-                        padding=[10,5])
+                    background=color.bg_inactive,
+                    foreground=color.fg_inactive,
+                    padding=[10,5])
         S.configure("TFrame", 
-                    background="darkgray")
+                    background=color.bg,
+                    foreground=color.fg,
+                    borderwidth=0,
+                    relief="flat")
         S.configure("TLabel",
-                    background="darkgray",
-                    foreground="black",
+                    background=color.bg,
+                    foreground=color.fg,
                     padding=[10,5])
 
 # Since the default_menu_dict contains functions that are not defined in this
 # class, but a child class, these should not be initiated directly. 
 class LinkTab(ttk.Frame):
     menu_style = {
-            'bg': 'darkgray'}
+            'bg': color.bg, 
+            'fg': color.fg,
+            'activebackground': color.bg_active,
+            'activeforeground': color.fg_active,
+            'bd': 0}
     # Constructor for LinkTab. Currently the accepted keywords are 
     #   menu -  The menu dictionary to use at the top of this tab
     def __init__(self,master,**kwargs):
@@ -148,6 +160,12 @@ class LinkTab(ttk.Frame):
 
 
 class TextTab(LinkTab):
+    text_style = {
+            'bg': color.bg_text,
+            'fg': color.fg_text,
+            'bd': 0,
+            'insertbackground': color.text_insert,
+            'font': "Ariel 12"}
     # Constructor for TextTab, see constructor for LinkTab for keywords
     # pertaining to the Tab structure. Keywords specific to the TextTab are:
     #   textwidth - width of the text box. Default is "100". 
@@ -187,8 +205,8 @@ class TextTab(LinkTab):
     # frame in which the text box is placed, as well as the text box itself, so that
     # the content of the text box can be updated from outside this function.
     def createFileArea(self, width="100"):
-        txt = Text(self, undo=True)
-        txt.grid(row=self.row_counter,column=0,sticky="NSEW")
+        txt = Text(self, undo=True, **self.text_style)
+        txt.grid(row=self.row_counter,column=0,sticky="NSEW",padx=5,pady=2)
         self.row_counter = self.row_counter + 1
 
         # Bind this textbox to the <<Modified>> event, which will call the 
