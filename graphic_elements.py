@@ -38,12 +38,6 @@ class LinkNotebook(ttk.Notebook):
         super().__init__(master)
         self.style()
 
-    def getTabs(self):
-        return self.tabs()
-
-    def getTab(self, tab_id):
-        return self.tab(tab_id)
-
     # Adds a tab to the notebook. Currently the accepted keywords are 
     # * kind -  what kind of tab this will be, the accepted values for this are 
     #           currently "TextTab"
@@ -100,13 +94,15 @@ class LinkTab(ttk.Frame):
             # define default menu dictionary for the top of the frame, 
             # which does nothing but log stuff. 
             default_menu_dict = {"File": {"New": log('New clicked'), 
-                                  "Open": log('Open clicked.')},
+                                "Open": log('Open clicked.'),
+                                "Close": self.close},
                          "Edit": {"Copy": log("Copy clicked"),
                                   "Paste": log("Paste clicked")
                                   }}
             menu = self.createMenubar(default_menu_dict)
 
         menu.grid(row=0, column=0,sticky="ew")
+
 
     # Creates the menubar which sits at the top of the current tab. The menu dictionary
     # which is passed to this method should have a top level menu item as the key,
@@ -152,6 +148,11 @@ class LinkTab(ttk.Frame):
                     return ''
         return f_handle
 
+    # Close the current tab (self)
+    def close(self):
+        index = self.master.index(self.master.select())
+        self.master.forget(index)
+
 
 
 class TextTab(LinkTab):
@@ -164,7 +165,8 @@ class TextTab(LinkTab):
         # define the default menu for the TextTab
         default_menu_dict = {"File": {"New": self.new_file, 
                               "Open": partial(self.open_file,"NONE", "r+"),
-                              "Save": self.save_file},
+                              "Save": self.save_file,
+                              "Close": self.close},
                      "Edit": {"Copy": partial(log, "Copy clicked"),
                               "Paste": partial(log,"Paste clicked"),
                               "Capitalize": self.capitalize_names,
@@ -317,8 +319,8 @@ class OperationTab(LinkTab):
     def __init__(self,master, **kwargs):
 
         # Define the menu for the operations tab. 
-        ops_menu = {'Comparison': {
-            'close': exit}}
+        ops_menu = {'File': {
+            'Close': self.close}}
         super().__init__(master,**kwargs,menu=ops_menu)
 
     # This should take the output of what ever command has been run and save it

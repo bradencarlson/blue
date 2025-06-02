@@ -25,8 +25,6 @@ class Link(ttk.Frame):
         menu_dict = {"View": {'Add Tab': self.addTab}}
         self.createMenu(menu_dict)
 
-
-        
     # Create a menu from a dictionary. See the createMenu method in the LinkTab
     # class in the graphic_elements file. 
     def createMenu(self, menu_dict):
@@ -43,8 +41,17 @@ class Link(ttk.Frame):
         label = simpledialog.askstring("New Tab", "Enter a label for the new tab:")
         self.notebook.addTab(kind="TextTab", text=label)
 
-    def getTabs(self):
-        return self.notebook.getTabs()
+    # Wrapper for the tabs method of the LinkNotebook class 
+    def tabs(self):
+        return self.notebook.tabs()
+
+    # Wrapper for the tab method of the LinkNotebook class
+    def tab(self,index):
+        return self.notebook.tab(index)
+
+    # Wrapper for select method of LinkNotebook class
+    def select(self,index=None):
+        return self.notebook.select(index)
 
 
         
