@@ -1,10 +1,11 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import simpledialog
+from tkinter import simpledialog, colorchooser
 from functools import partial
 from graphic_elements import *
 import logging
 import colors as color
+from dialog import NewTabDialog
 
 class Link(ttk.Frame):
 
@@ -15,10 +16,6 @@ class Link(ttk.Frame):
         self.master = master
 
         self.notebook = LinkNotebook(self)
-        self.notebook.addTab(kind="TextTab", text="Recommended")
-        self.notebook.addTab(kind="TextTab", text="Accepted")
-        self.notebook.addTab(kind="TextTab", text="Master File")
-        self.notebook.addTab(kind="OperationTab", text="Operations")
         self.notebook.pack(fill="both", expand=True)
         self.pack(fill="both", expand=True)
 
@@ -38,8 +35,9 @@ class Link(ttk.Frame):
         self.master.config(menu=menu)
 
     def addTab(self):
-        label = simpledialog.askstring("New Tab", "Enter a label for the new tab:")
-        self.notebook.addTab(kind="TextTab", text=label)
+        #label = simpledialog.askstring("New Tab", "Enter a label for the new tab:")
+        #self.notebook.addTab(kind="TextTab", text=label)
+        dialog = NewTabDialog(self)
 
     # Wrapper for the tabs method of the LinkNotebook class 
     def tabs(self):
@@ -57,5 +55,6 @@ class Link(ttk.Frame):
         
             
 root = Tk()
+root.configure(bg=color.bg)
 app = Link(root)
 root.mainloop()
