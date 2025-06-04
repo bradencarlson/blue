@@ -1,15 +1,70 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter.simpledialog import Dialog
+from tkinter.simpledialog import Dialog, Toplevel, _place_window
+import logging as log
 
 class NewTabDialog(Dialog):
-    def __init__(self,master):
-        super().__init__(master)
+    def __init__(self,master,title=None):
+
+        ##################################################
+        ### This was modified from the simpledialog.py, found at 
+        ### https://github.com/python/cpython/blob/3.13/Lib/tkinter/simpledialog.py
+        if master is None:
+            log.fatal("Master cannot be None in __init__ for NewTabDialog")
+            
+        Toplevel.__init__(self, master)
+
+        self.withdraw() # remain invisible for now
+        # If the parent is not viewable, don't
+        # make the child transient, or else it
+        # would be opened withdrawn
+        if master is not None and master.winfo_viewable():
+            self.transient(master)
+
+        if title:
+            self.title(title)
+
+        if self._windowingsystem == "aqua":
+            self.tk.call("::tk::unsupported::MacWindowStyle", "style",
+                  self, "moveableModal", "")
+        elif self._windowingsystem == "x11":
+            self.wm_attributes(type="dialog")
+
+        self.parent = master
+
+        self.result = None
+
+        body = Frame(self)
+        self.initial_focus = self.body(body)
+        # Basically the reason for including all of this was to set these two
+        # values to 0. 
+        body.pack(padx=0, pady=0)
+
+        self.buttonbox()
+
+        if self.initial_focus is None:
+            self.initial_focus = self
+
+        self.protocol("WM_DELETE_WINDOW", self.cancel)
+
+        _place_window(self, master)
+
+        self.initial_focus.focus_set()
+
+        # wait for window to appear on screen before calling grab_set
+        self.wait_visibility()
+        self.grab_set()
+        self.wait_window(self)
+
+
+        ### End content from simpledialog.py
+        ##################################################
+
         self.box = None
         self.tabtitle = None
 
     def body(self, master):
-        frm = ttk.Frame(self)
+        frm = ttk.Frame(master)
         lbl = ttk.Label(frm,text="Please enter a name for the new tab, along with what kind of tab it should be.", 
                         width=50, 
                         wrap=1,
@@ -28,24 +83,27 @@ class NewTabDialog(Dialog):
 
         self.box.grid(row=2,column=0, pady=5)
 
-        button_frame = ttk.Frame(frm)
+
+        frm.pack(expand=True)
+        return frm
+
+    def apply(self, event=None):
+        newtab_label = self.tablabel.get()
+        newtab_type = self.box.get()
+        try:
+            note = self.master.notebook
+            # TODO: add a new tab, either here or (preferably) in the main.py
+            # file.
+        except Exception as e:
+            print(e)
+
+    # Remove the default buttons
+    def buttonbox(self):
+        button_frame = ttk.Frame(self)
         ok_btn = ttk.Button(button_frame,text="Ok", command=self.ok)
         cancel_btn = ttk.Button(button_frame, text="Cancel", command=self.cancel)
         ok_btn.pack(side="left", padx=5, pady=5)
         cancel_btn.pack(side="left", padx=5, pady=5)
-        button_frame.grid(row=3, column=0)
-
-        frm.pack()
-        return frm
-
-    def ok(self, event=None):
-        newtab_label = self.tablabel.get()
-        newtab_type = self.box.get()
-
-    def cancal(self,event=None):
-        return
-
-    # Remove the default buttons
-    def buttonbox(self):
+        button_frame.pack(fill="both",expand=True,padx=0,pady=0)
         return
 
