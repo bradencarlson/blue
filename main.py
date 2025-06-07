@@ -5,7 +5,7 @@ from functools import partial
 from graphic_elements import *
 import logging
 import colors as color
-from dialog import NewTabDialog
+import dialog as dialog
 
 class Link(ttk.Frame):
 
@@ -37,7 +37,10 @@ class Link(ttk.Frame):
     def addTab(self):
         #label = simpledialog.askstring("New Tab", "Enter a label for the new tab:")
         #self.notebook.addTab(kind="TextTab", text=label)
-        dialog = NewTabDialog(self)
+        [label, kind] = dialog.askNewTab(self)
+        print(kind)
+        print(label)
+        self.notebook.addTab(kind=kind, text=label)
 
     # Wrapper for the tabs method of the LinkNotebook class 
     def tabs(self):

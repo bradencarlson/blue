@@ -62,6 +62,7 @@ class NewTabDialog(Dialog):
 
         self.box = None
         self.tabtitle = None
+        return self.apply()
 
     def body(self, master):
         frm = ttk.Frame(master)
@@ -87,15 +88,18 @@ class NewTabDialog(Dialog):
         frm.pack(expand=True)
         return frm
 
-    def apply(self, event=None):
-        newtab_label = self.tablabel.get()
-        newtab_type = self.box.get()
-        try:
-            note = self.master.notebook
-            # TODO: add a new tab, either here or (preferably) in the main.py
-            # file.
-        except Exception as e:
-            print(e)
+    def validate(self):
+        self.tablabel_result = self.tablabel.get()
+        kind = self.box.get()
+        if kind == "Text Tab":
+            self.tabkind = "TextTab"
+        elif kind == "Operations Tab":
+            self.tabkind = "OperationTab"
+        else:
+            self.tabkind = ""
+            return 0
+        return 1
+
 
     # Remove the default buttons
     def buttonbox(self):
@@ -106,4 +110,8 @@ class NewTabDialog(Dialog):
         cancel_btn.pack(side="left", padx=5, pady=5)
         button_frame.pack(fill="both",expand=True,padx=0,pady=0)
         return
+
+def askNewTab(master):
+    d = NewTabDialog(master)
+    return [d.tablabel_result, d.tabkind]
 
