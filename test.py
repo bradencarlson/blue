@@ -5,7 +5,7 @@ from main import Link
 
 root = Tk()
 app = Link(root)
-app.addTab(kind="OperationTab", label="Ops")
+app.add_tab(kind="OperationTab", label="Ops")
 
 
 app.mainloop()

@@ -1,11 +1,13 @@
-from tkinter import *
-from tkinter import ttk
-from graphic_elements import *
+from tkinter import Widget, Menu
+from graphic_elements import LinkNotebook
 import colors as color
-import dialog as dialog
+import dialog as dlg
 
 class Link(Widget):
-
+    """ Main Widget to be placed on the root window for the application.
+    This class contains a LinkNotebook which holds all the tabs needed to
+    perform the tasks necessary. It also holds the menu for the application, so
+    the root window should not have a menu added to it. """
 
     def __init__(self, master):
         super().__init__(master,'frame')
@@ -16,14 +18,13 @@ class Link(Widget):
         self.notebook.pack(fill="both", expand=True)
         self.pack(fill="both", expand=True)
 
-        menu_dict = {"View": {'Add Tab': self.addTab}}
-        self.createMenu(menu_dict)
+        menu_dict = {"View": {'Add Tab': self.add_tab}}
+        self.create_menu(menu_dict)
 
-    # Create a menu from a dictionary. See the createMenu method in the LinkTab
-    # class in the graphic_elements file. 
-    def createMenu(self, menu_dict):
+    def create_menu(self, menu_dict):
+        """ Create a menu from a dictionary. See the create_menu method in the LinkTab
+        class in the graphic_elements file. """
         menu = Menu(self,tearoff=0,**color.menu_style)
-        pos = 0
         for label, submenu_dict in menu_dict.items():
             submenu = Menu(menu,tearoff=0,**color.menu_style)
             for sub_label, command in submenu_dict.items():
@@ -31,35 +32,37 @@ class Link(Widget):
             menu.add_cascade(label=label, menu=submenu)
         self.master.config(menu=menu)
 
-    def addTab(self,**kwargs):
+    def add_tab(self,**kwargs):
+        """ Adds a tab to the LinkNotebook. If the proper keyword arguments are
+        not passed to this method, then the application will open a NewTabDialog
+        which will prompt the user for the name of the tab and what kind of tab
+        it should be. """
 
         # KEYWORD ARGS
 
         # kind - what kind of tab to add
-        # label - what the tab should be labeled. 
+        # label - what the tab should be labeled.
 
-        try: 
-            self.notebook.addTab(kind=kwargs['kind'], 
+        try:
+            self.notebook.add_tab(kind=kwargs['kind'],
                                  text=kwargs['label'])
-        except Exception as e:
-            [label, kind] = dialog.askNewTab(self)
-            self.notebook.addTab(kind=kind, text=label)
+        except KeyError:
+            [label, kind] = dlg.askNewTab(self)
+            self.notebook.add_tab(kind=kind, text=label)
 
-    # Wrapper for the tabs method of the LinkNotebook class 
     def tabs(self):
+        """ Wrapper for the tabs method of the LinkNotebook class """
         return self.notebook.tabs()
 
-    # Wrapper for the tab method of the LinkNotebook class
     def tab(self,index):
+        """ Wrapper for the tab method of the LinkNotebook class """
         return self.notebook.tab(index)
 
-    # Wrapper for select method of LinkNotebook class
     def select(self,index=None):
+        """ Wrapper for select method of LinkNotebook class """
         return self.notebook.select(index)
 
 
-        
-            
 #root = Tk()
 #root.configure(bg=color.bg)
 #app = Link(root)

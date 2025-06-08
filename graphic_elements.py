@@ -6,15 +6,15 @@
 # blocks of the Link Application. 
 #
 # The LinkNotebook class is a ttk.Notebook with some added methods for ease of
-# use in the main.py file.  Most notably, there is an addTab method which adds a
+# use in the main.py file.  Most notably, there is an add_tab method which adds a
 # tab to the notebook. The method declaration takes the form
-#   def addTab(self, **kwargs)
+#   def add_tab(self, **kwargs)
 # so all args passed to this method must be named by a keyword, a description of
 # which can be found above the method itself. In this file, all keywords marked
 # with a '*' are required to be used for the method to function correctly. 
 #
 # The LinkTab class is a Frame to be used as the tabs of the LinkNotebook. This
-# is automatically created by the LinkNotebook.addTab method, so these do not
+# is automatically created by the LinkNotebook.add_tab method, so these do not
 # need to be created in the main.py file or elsewhere. This classes' constructor
 # has some keyword arguments which can be specified, which are described in the
 # class definition. Each LinkTab has a menu across the top of it, which can be
@@ -42,7 +42,7 @@ class LinkNotebook(ttk.Notebook):
     # * kind -  what kind of tab this will be, the accepted values for this are 
     #           currently "TextTab"
     #   text -  the text label which will appear on the tab. 
-    def addTab(self, **kwargs):
+    def add_tab(self, **kwargs):
         try:
             if kwargs['kind'] == "TextTab":
                 newTab = TextTab(self,**kwargs)
