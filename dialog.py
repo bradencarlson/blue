@@ -82,14 +82,12 @@ class NewTabDialog(Dialog):
                                 width=30)
         self.box.set('Text Tab')
 
-
-
         lbl.pack()
         self.tablabel.pack(pady=5)
         self.box.pack(pady=5)
 
-
         frm.pack(expand=True)
+
         return frm
 
     def validate(self):

@@ -1,17 +1,14 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import simpledialog, colorchooser
-from functools import partial
 from graphic_elements import *
-import logging
 import colors as color
 import dialog as dialog
 
-class Link(ttk.Frame):
+class Link(Widget):
 
 
     def __init__(self, master):
-        super().__init__(master)
+        super().__init__(master,'frame')
         # Save this so I can add the menu to the top level widget.
         self.master = master
 
@@ -34,13 +31,19 @@ class Link(ttk.Frame):
             menu.add_cascade(label=label, menu=submenu)
         self.master.config(menu=menu)
 
-    def addTab(self):
-        #label = simpledialog.askstring("New Tab", "Enter a label for the new tab:")
-        #self.notebook.addTab(kind="TextTab", text=label)
-        [label, kind] = dialog.askNewTab(self)
-        print(kind)
-        print(label)
-        self.notebook.addTab(kind=kind, text=label)
+    def addTab(self,**kwargs):
+
+        # KEYWORD ARGS
+
+        # kind - what kind of tab to add
+        # label - what the tab should be labeled. 
+
+        try: 
+            self.notebook.addTab(kind=kwargs['kind'], 
+                                 text=kwargs['label'])
+        except Exception as e:
+            [label, kind] = dialog.askNewTab(self)
+            self.notebook.addTab(kind=kind, text=label)
 
     # Wrapper for the tabs method of the LinkNotebook class 
     def tabs(self):
@@ -57,7 +60,7 @@ class Link(ttk.Frame):
 
         
             
-root = Tk()
-root.configure(bg=color.bg)
-app = Link(root)
-root.mainloop()
+#root = Tk()
+#root.configure(bg=color.bg)
+#app = Link(root)
+#root.mainloop()

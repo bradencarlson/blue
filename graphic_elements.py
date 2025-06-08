@@ -323,8 +323,31 @@ class OperationTab(LinkTab):
             'Close': self.close}}
         super().__init__(master,**kwargs,menu=ops_menu)
 
+        # for my own reference, declare what children this Tab will keep track
+        # of, and what type they are. 
+
+        self.output = None # Text()
+
+        self.row_counter = 1
+        
+        self.createOutputArea()
+
     # This should take the output of what ever command has been run and save it
     # to a file.
     def save_file(self):
         return
+
+    def createOutputArea(self):
+        frm = ttk.Frame(self)
+        self.output = Text(frm)
+        self.output.pack(expand=True)
+        
+        super().grid_rowconfigure(self.row_counter, weight=1)
+
+        frm.grid(row=self.row_counter, column=0, sticky="NSEW")
+        self.row_counter = self.row_counter + 1
+
+
+
+
 
