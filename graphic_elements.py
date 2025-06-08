@@ -1,128 +1,143 @@
-# graphic_elements.py
-# Written By: Braden Carlson
-# May 2025
-# 
-# Defines the LinkNotebook, LinkTab, and TextTab classes, which are the building
-# blocks of the Link Application. 
-#
-# The LinkNotebook class is a ttk.Notebook with some added methods for ease of
-# use in the main.py file.  Most notably, there is an add_tab method which adds a
-# tab to the notebook. The method declaration takes the form
-#   def add_tab(self, **kwargs)
-# so all args passed to this method must be named by a keyword, a description of
-# which can be found above the method itself. In this file, all keywords marked
-# with a '*' are required to be used for the method to function correctly. 
-#
-# The LinkTab class is a Frame to be used as the tabs of the LinkNotebook. This
-# is automatically created by the LinkNotebook.add_tab method, so these do not
-# need to be created in the main.py file or elsewhere. This classes' constructor
-# has some keyword arguments which can be specified, which are described in the
-# class definition. Each LinkTab has a menu across the top of it, which can be
-# customized at construction. 
-#
-# The TextTab class is an extension of the LinkTab class, and is a LinkTab which
-# contains a Text object to be used to view and modify files. The constructor
-# for this class has some keyword arguments, which are described in the class
-# definition. 
+""" graphic_elements.py
+Written By: Braden Carlson
+May 2025
 
-from tkinter import *
+Defines the LinkNotebook, LinkTab, and TextTab classes, which are the building
+blocks of the Link Application.
+
+The LinkNotebook class is a ttk.Notebook with some added methods for ease of
+use in the main.py file.  Most notably, there is an add_tab method which adds a
+tab to the notebook. The method declaration takes the form
+  def add_tab(self, **kwargs)
+so all args passed to this method must be named by a keyword, a description of
+which can be found above the method itself. In this file, all keywords marked
+with a '*' are required to be used for the method to function correctly.
+
+The LinkTab class is a Frame to be used as the tabs of the LinkNotebook. This
+is automatically created by the LinkNotebook.add_tab method, so these do not
+need to be created in the main.py file or elsewhere. This classes' constructor
+has some keyword arguments which can be specified, which are described in the
+class definition. Each LinkTab has a menu across the top of it, which can be
+customized at construction.
+
+The TextTab class is an extension of the LinkTab class, and is a LinkTab which
+contains a Text object to be used to view and modify files. The constructor
+for this class has some keyword arguments, which are described in the class
+definition. """
+
+from tkinter import Menu, Menubutton, StringVar, Text
 from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
-from logging import log
-import colors as color
+from logging import log, fatal
 import re
+import colors as color
 
 class LinkNotebook(ttk.Notebook):
+    """ A notebook to hold tabs for the user. Currently this class has the
+    add_tab method, and a style method. The style method sets the style for the
+    main widgets which are used in this class and it's children.
+
+    The add_tab method expects a few keyword arguments from the caller:
+        kind - what kind of tab to add, see method for more details
+        text - the label of the new tab
+    """
+
     def __init__(self, master):
         super().__init__(master)
         self.style()
 
-    # Adds a tab to the notebook. Currently the accepted keywords are 
-    # * kind -  what kind of tab this will be, the accepted values for this are 
-    #           currently "TextTab"
-    #   text -  the text label which will appear on the tab. 
     def add_tab(self, **kwargs):
+        """ Adds a tab to the notebook. Currently the accepted keywords are
+        * kind -  what kind of tab this will be, the accepted values for this are
+                  currently "TextTab"
+          text -  the text label which will appear on the tab. """
+
         try:
             if kwargs['kind'] == "TextTab":
-                newTab = TextTab(self,**kwargs)
+                new_tab = TextTab(self,**kwargs)
                 try:
-                    self.add(newTab, text=kwargs['text'])
+                    self.add(new_tab, text=kwargs['text'])
                 except KeyError:
-                    self.add(newTab, "New Tab")
+                    self.add(new_tab, "New Tab")
             elif kwargs['kind'] == "OperationTab":
-                newTab = OperationTab(self,**kwargs)
+                new_tab = OperationTab(self,**kwargs)
                 try:
-                    self.add(newTab, text=kwargs['text'])
+                    self.add(new_tab, text=kwargs['text'])
                 except KeyError:
-                    self.add(newTab, "New Tab")
+                    self.add(new_tab, "New Tab")
         except KeyError as e:
-           fatal(e) 
+            fatal(e)
+
     def style(self):
-        S = ttk.Style()
-        S.map("TNotebook.Tab",
+        """ Sets the style for most of the widgets that this class and it's
+        children use. This provides a uniform look across the application."""
+
+        s = ttk.Style()
+        s.map("TNotebook.Tab",
                     background=[('selected', color.bg)],
                     foreground=[('selected', color.fg)])
-        S.configure("TNotebook.Tab",
+        s.configure("TNotebook.Tab",
                     background=color.bg_inactive,
                     foreground=color.fg_inactive,
                     padding=[10,5])
-        S.configure("TFrame", 
+        s.configure("TFrame",
                     background=color.bg,
                     foreground=color.fg,
                     borderwidth=0,
                     relief="flat")
-        S.configure("TLabel",
+        s.configure("TLabel",
                     background=color.bg,
                     foreground=color.fg,
                     padding=[10,5])
 
-# Since the default_menu_dict contains functions that are not defined in this
-# class, but a child class, these should not be initiated directly. 
 class LinkTab(ttk.Frame):
+    """ Since the default_menu_dict contains functions that are not defined in this
+    class, but a child class, these should not be initiated directly. """
 
-    # Constructor for LinkTab. Currently the accepted keywords are 
-    #   menu -  The menu dictionary to use at the top of this tab
     def __init__(self,master,**kwargs):
+        """ Constructor for LinkTab. Currently the accepted keywords are
+            menu -  The menu dictionary to use at the top of this tab """
+
         super().__init__(master)
 
         self.grid_columnconfigure(0,weight=1)
-        
+
         try:
-            menu = self.createMenubar(kwargs['menu'])
+            menu = self.create_menubar(kwargs['menu'])
         except KeyError:
-            # define default menu dictionary for the top of the frame, 
-            # which does nothing but log stuff. 
-            default_menu_dict = {"File": {"New": log('New clicked'), 
+            # define default menu dictionary for the top of the frame,
+            # which does nothing but log stuff.
+            default_menu_dict = {"File": {"New": log('New clicked'),
                                 "Open": log('Open clicked.'),
                                 "Close": self.close},
                          "Edit": {"Copy": log("Copy clicked"),
                                   "Paste": log("Paste clicked")
                                   }}
-            menu = self.createMenubar(default_menu_dict)
+            menu = self.create_menubar(default_menu_dict)
 
         menu.grid(row=0, column=0,sticky="ew")
 
 
-    # Creates the menubar which sits at the top of the current tab. The menu dictionary
-    # which is passed to this method should have a top level menu item as the key,
-    # then a dictionary as the value, the keys of which are labels, and values
-    # commands to be run. For example: 
-    # 
-    # to generate the menu 
-    # File
-    #   New -> new_function
-    #   Open -> open_function
-    #
-    # the following should be passed:
-    #
-    # {"File": {"New": new_function, "Open": open_function}}
-    #
-    def createMenubar(self, menu_dict):
-        menu = ttk.Frame(self);
+    def create_menubar(self, menu_dict):
+        """ Creates the menubar which sits at the top of the current tab. The menu dictionary
+        which is passed to this method should have a top level menu item as the key,
+        then a dictionary as the value, the keys of which are labels, and values
+        commands to be run. For example:
+ 
+        to generate the menu
+        File
+          New -> new_function
+          Open -> open_function
+ 
+        the following should be passed:
+ 
+        {"File": {"New": new_function, "Open": open_function}} """
+
+        menu = ttk.Frame(self)
         pos = 0
         for (text, submenu_dict) in menu_dict.items():
-            submenu = Menubutton(menu,text=text,**color.menu_style);
+            submenu = Menubutton(menu,text=text,**color.menu_style)
             menuitems = Menu(submenu, tearoff=0,**color.menu_style)
             for (submenu_label,submenu_command) in submenu_dict.items():
                 menuitems.add_command(label=str(submenu_label),
@@ -132,38 +147,42 @@ class LinkTab(ttk.Frame):
             pos = pos + 1
         return menu
 
-    # Opens a file for editing, if there is any error in opening the file, a
-    # dialog is opened and the user is asked to select a file for opening. 
     def open_file(self, filename, permissions="r"):
-        f_handle = 0;
+        """ Opens a file for editing, if there is any error in opening the file, a
+        dialog is opened and the user is asked to select a file for opening. """
+
+        f_handle = 0
         while not f_handle:
             try:
-                f_handle = open(filename,permissions)
-            except Exception as e: 
+                with open(filename,permissions) as f_handle:
+                    return f_handle
+            except FileNotFoundError as e:
                 log(f"{e}")
                 log("Asking user to select a file.")
                 filename = filedialog.askopenfilename()
                 # if the user selects cancel do nothing
                 if filename == '':
                     return ''
-        return f_handle
 
-    # Close the current tab (self)
     def close(self):
+        """ Close the current tab (self) """
         index = self.master.index(self.master.select())
         self.master.forget(index)
 
 
 
 class TextTab(LinkTab):
+    """ Tab which contains a large text area for viewing files, as well as a
+    menu which contains the standard things for dealing with files, along with
+    some operations which are specific to this application. """
 
-    # Constructor for TextTab, see constructor for LinkTab for keywords
-    # pertaining to the Tab structure. Keywords specific to the TextTab are:
-    #   textwidth - width of the text box. Default is "100". 
     def __init__(self, master, **kwargs):
+        """ Constructor for TextTab, see constructor for LinkTab for keywords
+        pertaining to the Tab structure. Keywords specific to the TextTab are:
+          textwidth - width of the text box. Default is "100". """
 
         # define the default menu for the TextTab
-        default_menu_dict = {"File": {"New": self.new_file, 
+        default_menu_dict = {"File": {"New": self.new_file,
                               "Open": partial(self.open_file,"NONE", "r+"),
                               "Save": self.save_file,
                               "Close": self.close},
@@ -185,41 +204,44 @@ class TextTab(LinkTab):
         # super().__init__() ) is at row 0.
         self.row_counter = 1
 
-        self.createFilenameLabel()
+        self.create_filename_label()
 
         try:
-            self.textarea = self.createFileArea(kwargs['textwidth'])
-        except KeyError: 
-            self.textarea = self.createFileArea()
+            self.textarea = self.create_file_area(kwargs['textwidth'])
+        except KeyError:
+            self.textarea = self.create_file_area()
         super().grid_rowconfigure(self.row_counter - 1, weight=1)
 
-    # Creates an area where text can be displayed.  Returns both a reference to the
-    # frame in which the text box is placed, as well as the text box itself, so that
-    # the content of the text box can be updated from outside this function.
-    def createFileArea(self, width="100"):
+    def create_file_area(self):
+        """ Creates an area where text can be displayed.  Returns both a reference to the
+        frame in which the text box is placed, as well as the text box itself, so that
+        the content of the text box can be updated from outside this function. """
+
         txt = Text(self, undo=True, **color.text_style)
         txt.grid(row=self.row_counter,column=0,sticky="NSEW",padx=5,pady=2)
         self.row_counter = self.row_counter + 1
 
-        # Bind this textbox to the <<Modified>> event, which will call the 
+        # Bind this textbox to the <<Modified>> event, which will call the
         # on_modified method, so that a * is added to the filename label.
         txt.bind("<<Modified>>", self.on_modified)
         return txt
 
-    # Creates a label which will contain the current value of the filename_label
-    # variable. This will be used to remind the user which file is open, as well
-    # as notify them when there are unsaved changes. 
-    def createFilenameLabel(self):
+    def create_filename_label(self):
+        """ Creates a label which will contain the current value of the filename_label
+        variable. This will be used to remind the user which file is open, as well
+        as notify them when there are unsaved changes. """
+
         lbl = ttk.Label(self, textvariable=self.filename_label)
         lbl.grid(row=self.row_counter,column=0,sticky="W")
         self.row_counter = self.row_counter + 1
 
-    # Opens a file in the TextTab's textarea. The way this is done is by passing
-    # the actual open operation to the parent, then simply loading the text into
-    # the textbox is the user made a choice of which file to open.  If the user
-    # did not choose a file (i.e. they pressed the cancel button) this method
-    # returns nothing and stops. 
     def open_file(self, filename, permissions="r"):
+        """ Opens a file in the TextTab's textarea. The way this is done is by passing
+        the actual open operation to the parent, then simply loading the text into
+        the textbox is the user made a choice of which file to open.  If the user
+        did not choose a file (i.e. they pressed the cancel button) this method
+        returns nothing and stops. """
+
         f_handle = super().open_file(filename, permissions)
         if f_handle == '':
             return
@@ -227,10 +249,10 @@ class TextTab(LinkTab):
         self.textarea.insert(1.0, f_handle.read())
         self.textarea.index(1.0)
 
-        # Set the filename_label variable. 
+        # Set the filename_label variable.
         temp_filename = f_handle.name
         # TODO: This assumes unix style path names and is thus not very
-        # portable.  
+        # portable.
         temp_filename = re.sub(r"(.*)/([^/]*)$",r'\2', temp_filename)
         self.filename_label.set(temp_filename)
 
@@ -238,37 +260,44 @@ class TextTab(LinkTab):
         self.filename.set(f_handle.name)
 
         # Since we just opened a new file, make sure that the edit_modified flag
-        # is turned off so there is no * next to the file name. 
+        # is turned off so there is no * next to the file name.
         self.textarea.edit_modified(False)
 
 
-    # Method to call when the textbox on this tab is modified. It simply takes
-    # the curent filename_label and adds a * to the end, if there is not one
-    # already. 
     def on_modified(self, event):
+        """ Method to call when the textbox on this tab is modified. It simply takes
+        the curent filename_label and adds a * to the end, if there is not one
+        already. """
+
         if self.textarea.edit_modified():
             if not self.filename_label.get().endswith("*"):
                 self.filename_label.set(self.filename_label.get() + "*")
 
-    # Saves the file.  This is as simple as using the current filename (from
-    # open_file) and writing the text from the textarea to it. 
     def save_file(self):
+        """ Saves the file.  This is as simple as using the current filename (from
+        open_file) and writing the text from the textarea to it. """
+
         if self.filename.get() == '':
             self.filename.set(filedialog.asksaveasfilename())
             self.filename_label.set(re.sub(r"(.*)/([^/]*)$",r'\2',self.filename.get()))
         try:
             f_handle = open(self.filename.get(), "w")
-        except Exception as e: 
-            log(f"Something went wrong trying to save {self.filename}")
+        except FileNotFoundError:
+            log(f"{self.filename} was not found.")
             log(e)
             return
+        except IsADirectoryError:
+            log(f"{self.filename} is a directory, cannot save file.")
+            return
+
         self.textarea.edit_modified(False)
         self.filename_label.set(re.sub(r"(.*)\*$",r"\1",self.filename_label.get()))
         f_handle.write(self.textarea.get(1.0, "end-1c"))
 
-    # If there are unsaved changes, save them, then clear the textarea and reset
-    # the filename label so the user can start a new file. 
     def new_file(self):
+        """ If there are unsaved changes, save them, then clear the textarea and reset
+        the filename label so the user can start a new file. """
+
         if self.textarea.edit_modified():
             self.save_file()
         self.textarea.delete(1.0,"end")
@@ -277,14 +306,15 @@ class TextTab(LinkTab):
         self.filename_label.set("New File")
         return
 
-    # Capitalize each word of the current file. Send a warning to the user first
-    # confirming that this is what they want to do. 
     def capitalize_names(self):
-        msg = """This operation will capitalize all words in the current file. 
+        """ Capitalize each word of the current file. Send a warning to the user first
+        confirming that this is what they want to do. """
+
+        msg = """This operation will capitalize all words in the current file.
         It is recommended to be used on files whose entire contents are lists of names"""
         if not messagebox.askyesno("Are you sure?", msg):
             return
-        
+
         # mark this point as a point the user can jump back to with the Undo
         # button
         self.textarea.edit_separator()
@@ -293,8 +323,8 @@ class TextTab(LinkTab):
         content = re.sub(r"([a-zA-Z]+)",lambda m: m.group(0).capitalize(),content)
         self.textarea.replace(1.0,"end",content)
 
-    # Sort lines of the textbox
     def sort(self):
+        """ Sort lines of the textbox """
 
         # mark this point as a point the user can jump back to with the Undo
         # button
@@ -305,49 +335,49 @@ class TextTab(LinkTab):
         content = [x for x in content if x != '']
         self.textarea.replace(1.0,"end","\n".join(content))
 
-    # Use the undo feature from the textbox. 
     def undo(self):
+        """ Use the undo feature from the textbox. """
         self.textarea.edit_undo()
 
-    # Use the redo feature from the textbox. 
     def redo(self):
+        """ Use the redo feature from the textbox. """
         self.textarea.edit_redo()
 
 
 
 class OperationTab(LinkTab):
+    """ This tab contains the controls for taking diffs of files (not line by
+    line) which are contained in the other tabs of the app. """
+
     def __init__(self,master, **kwargs):
 
-        # Define the menu for the operations tab. 
+        # Define the menu for the operations tab.
         ops_menu = {'File': {
             'Close': self.close}}
         super().__init__(master,**kwargs,menu=ops_menu)
 
         # for my own reference, declare what children this Tab will keep track
-        # of, and what type they are. 
+        # of, and what type they are.
 
         self.output = None # Text()
 
         self.row_counter = 1
-        
-        self.createOutputArea()
 
-    # This should take the output of what ever command has been run and save it
-    # to a file.
+        self.create_output_area()
+
     def save_file(self):
+        """ This should take the output of what ever command has been run and save it
+        to a file. """
         return
 
-    def createOutputArea(self):
+    def create_output_area(self):
+        """ Puts a text area in the tab so that output from the various commands
+        can be viewed and saved if desired. """
         frm = ttk.Frame(self)
         self.output = Text(frm)
         self.output.pack(expand=True)
-        
+
         super().grid_rowconfigure(self.row_counter, weight=1)
 
         frm.grid(row=self.row_counter, column=0, sticky="NSEW")
         self.row_counter = self.row_counter + 1
-
-
-
-
-
