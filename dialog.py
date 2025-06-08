@@ -62,6 +62,7 @@ class NewTabDialog(Dialog):
 
         self.box = None
         self.tabtitle = None
+        self.error_lbl
         return self.apply()
 
     def body(self, master):
@@ -71,6 +72,10 @@ class NewTabDialog(Dialog):
                         wrap=1,
                         wraplength=350)
 
+        self.error_lbl = ttk.Label(frm, text="Something went wrong, please try again", 
+                              foreground="red",
+                              width=50)
+
         self.tablabel = Entry(frm, width=32)
         self.tablabel.insert(0, "New Tab")
         self.box = ttk.Combobox(frm, values=['Text Tab', 'Operations Tab'],
@@ -79,10 +84,9 @@ class NewTabDialog(Dialog):
 
 
 
-        lbl.grid(row=0, column=0)
-        self.tablabel.grid(row=1,column=0, pady=5)
-
-        self.box.grid(row=2,column=0, pady=5)
+        lbl.pack()
+        self.tablabel.pack(pady=5)
+        self.box.pack(pady=5)
 
 
         frm.pack(expand=True)
@@ -97,6 +101,7 @@ class NewTabDialog(Dialog):
             self.tabkind = "OperationTab"
         else:
             self.tabkind = ""
+            self.error_lbl.pack()
             return 0
         return 1
 
