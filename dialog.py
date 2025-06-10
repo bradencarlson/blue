@@ -114,7 +114,7 @@ class NewTabDialog(Dialog):
         button_frame.pack(fill="both",expand=True,padx=0,pady=0)
         return
 
-def askNewTab(master):
+def ask_new_tab(master):
     d = NewTabDialog(master)
     return [d.tablabel_result, d.tabkind]
 

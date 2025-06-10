@@ -18,7 +18,8 @@ class Link(Widget):
         self.notebook.pack(fill="both", expand=True)
         self.pack(fill="both", expand=True)
 
-        menu_dict = {"View": {'Add Tab': self.add_tab}}
+        menu_dict = {"Slinky": {'Close': self.close},
+                     "View": {'Add Tab': self.add_tab}}
         self.create_menu(menu_dict)
 
     def create_menu(self, menu_dict):
@@ -47,7 +48,7 @@ class Link(Widget):
             self.notebook.add_tab(kind=kwargs['kind'],
                                  text=kwargs['label'])
         except KeyError:
-            [label, kind] = dlg.askNewTab(self)
+            [label, kind] = dlg.ask_new_tab(self)
             self.notebook.add_tab(kind=kind, text=label)
 
     def tabs(self):
@@ -61,6 +62,10 @@ class Link(Widget):
     def select(self,index=None):
         """ Wrapper for select method of LinkNotebook class """
         return self.notebook.select(index)
+
+    def close(self):
+        """ Quit the applitation """
+        super().quit()
 
 
 #root = Tk()

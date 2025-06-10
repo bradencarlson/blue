@@ -373,11 +373,10 @@ class OperationTab(LinkTab):
     def create_output_area(self):
         """ Puts a text area in the tab so that output from the various commands
         can be viewed and saved if desired. """
-        frm = ttk.Frame(self)
-        self.output = Text(frm)
-        self.output.pack(expand=True)
 
-        super().grid_rowconfigure(self.row_counter, weight=1)
+        self.output = Text(self)
 
-        frm.grid(row=self.row_counter, column=0, sticky="NSEW")
+        self.grid_rowconfigure(self.row_counter, weight=1)
+
+        self.output.grid(row=self.row_counter, column=0, sticky="NSEW")
         self.row_counter = self.row_counter + 1
