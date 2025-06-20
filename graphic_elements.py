@@ -30,6 +30,7 @@ from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
 from logging import log, fatal
+from fops import sort_lines
 import re
 import colors as color
 
@@ -328,12 +329,15 @@ class TextTab(LinkTab):
 
         # mark this point as a point the user can jump back to with the Undo
         # button
+        self.mark_jump_point()
+        s = sort_lines(self.get_lines())
+        self.textarea.replace(1.0,"end",s)
+
+    def mark_jump_point(self):
         self.textarea.edit_separator()
 
-        content = self.textarea.get(1.0,"end").splitlines()
-        content.sort()
-        content = [x for x in content if x != '']
-        self.textarea.replace(1.0,"end","\n".join(content))
+    def get_lines(self):
+        return self.textarea.get(1.0,"end").splitlines()
 
     def undo(self):
         """ Use the undo feature from the textbox. """
