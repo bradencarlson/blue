@@ -30,9 +30,8 @@ from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
 from logging import log, fatal
-from fops import sort_lines
-import re
 import colors as color
+import fops as fo
 
 class LinkNotebook(ttk.Notebook):
     """ A notebook to hold tabs for the user. Currently this class has the
@@ -321,17 +320,16 @@ class TextTab(LinkTab):
         self.textarea.edit_separator()
 
         content = self.textarea.get(1.0,"end")
-        content = re.sub(r"([a-zA-Z]+)",lambda m: m.group(0).capitalize(),content)
+        content = fo.capitalize(content)
         self.textarea.replace(1.0,"end",content)
 
     def sort(self):
         """ Sort lines of the textbox """
 
-        # mark this point as a point the user can jump back to with the Undo
-        # button
+        # mark this point
         self.mark_jump_point()
-        s = sort_lines(self.get_lines())
-        self.textarea.replace(1.0,"end",s)
+        s = fo.sort_lines(self.get_lines())
+        self.replace(1.0,"end",s)
 
     def mark_jump_point(self):
         self.textarea.edit_separator()
@@ -346,6 +344,10 @@ class TextTab(LinkTab):
     def redo(self):
         """ Use the redo feature from the textbox. """
         self.textarea.edit_redo()
+
+    def replace(self, start, end, string):
+        """ Call the replace method of the textarea in this tab. """
+        self.textarea.replace(start, end,string)
 
 
 
