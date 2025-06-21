@@ -316,13 +316,12 @@ class TextTab(LinkTab):
         if not messagebox.askyesno("Are you sure?", msg):
             return
 
-        # mark this point as a point the user can jump back to with the Undo
-        # button
-        self.textarea.edit_separator()
+        # mark this point
+        self.mark_jump_point()
 
         content = self.get_content()
         content = fo.capitalize_words(content)
-        self.replace(1.0,"end-1c",content)
+        self.replace(1.0,"end",content)
 
     def sort(self):
         """ Sort lines of the textbox """
