@@ -67,6 +67,12 @@ class Link(Widget):
         """ Quit the applitation """
         super().quit()
 
+    def current_tab(self):
+        tab_id = self.notebook.select()
+        index = self.notebook.index(tab_id)
+        return self.notebook.get_tab(index)
+
+
 
 #root = Tk()
 #root.configure(bg=color.bg)
