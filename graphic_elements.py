@@ -32,6 +32,7 @@ from functools import partial
 from logging import log, fatal
 import colors as color
 import fops as fo
+import re
 
 class LinkNotebook(ttk.Notebook):
     """ A notebook to hold tabs for the user. Currently this class has the
@@ -319,23 +320,36 @@ class TextTab(LinkTab):
         # button
         self.textarea.edit_separator()
 
-        content = self.textarea.get(1.0,"end")
-        content = fo.capitalize(content)
-        self.textarea.replace(1.0,"end",content)
+        content = self.get_content()
+        content = fo.capitalize_words(content)
+        self.replace(1.0,"end-1c",content)
 
     def sort(self):
         """ Sort lines of the textbox """
 
         # mark this point
         self.mark_jump_point()
-        s = fo.sort_lines(self.get_lines())
-        self.replace(1.0,"end",s)
+        s = self.get_content()
+        s = fo.sort_lines(s)
+        self.replace(1.0,"end-1c",s)
 
     def mark_jump_point(self):
+        """ Make the point at which this is called a place the user can jump
+        back to useing the undo and redo buttons. The command to do this wasn't
+        long, but does not have a very intuitive name. """
+
         self.textarea.edit_separator()
 
     def get_lines(self):
-        return self.textarea.get(1.0,"end").splitlines()
+        """ Get the content of the text area, as a list of strings, each
+        of which is a line of the file. """
+
+        return self.get_content().splitlines()
+
+    def get_content(self):
+        """ Get the content of the text area, as a single string. """
+
+        return self.textarea.get(1.0,"end-1c")
 
     def undo(self):
         """ Use the undo feature from the textbox. """
@@ -347,7 +361,8 @@ class TextTab(LinkTab):
 
     def replace(self, start, end, string):
         """ Call the replace method of the textarea in this tab. """
-        self.textarea.replace(start, end,string)
+        self.textarea.delete(start,end)
+        self.textarea.insert(start,string)
 
 
 

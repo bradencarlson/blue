@@ -8,10 +8,19 @@ will need while useing this application.
 
 import re
 
-def sort_lines(lines):
-    """ sorts an array of strings by alphabetical order. """
-    return lines.sort()
+def sort_lines(string):
+    """ sorts lines in a string. """
 
-def capitalize(string):
-    string = re.sub(r"/([a-zA-Z]+)/",lambda m: m.group(0).capitalize(), string)
+    lines = list(string.splitlines() or [])
+    lines.sort()
+    print(lines)
+    new = '\n'.join(lines)
+    return new
+
+
+def capitalize_words(string):
+    """ Capitalize each word (defined as any string of alphbetic chars) of the
+    parameter. """
+
+    string = re.sub(r"([a-zA-Z]+)",lambda m: m.group(0).capitalize(), string)
     return string
