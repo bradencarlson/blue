@@ -154,8 +154,8 @@ class LinkTab(ttk.Frame):
         f_handle = 0
         while not f_handle:
             try:
-                with open(filename,permissions) as f_handle:
-                    return f_handle
+                f_handle = open(filename, permissions)
+                return f_handle
             except FileNotFoundError as e:
                 log(f"{e}")
                 log("Asking user to select a file.")
