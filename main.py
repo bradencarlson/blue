@@ -72,6 +72,9 @@ class Link(Widget):
         index = self.notebook.index(tab_id)
         return self.notebook.get_tab(index)
 
+    def get_tab(index):
+        return self.notebook.get_tab(index)
+
 
 
 #root = Tk()

@@ -12,6 +12,7 @@ app.select(1)
 tab = app.current_tab()
 
 tab.open_file("caps-test.txt")
+tab.capitalize_names()
 
 app.mainloop()
 
