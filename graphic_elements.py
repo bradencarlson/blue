@@ -364,6 +364,7 @@ class OperationTab(LinkTab):
         self.row_counter = 1
 
         self.create_output_area()
+        self.create_controls()
 
     def save_file(self):
         """ This should take the output of what ever command has been run and save it
@@ -378,5 +379,22 @@ class OperationTab(LinkTab):
 
         self.grid_rowconfigure(self.row_counter, weight=1)
 
-        self.output.grid(row=self.row_counter, column=0, sticky="NSEW")
+        self.output.grid(row=self.row_counter, column=0, sticky="NS")
         self.row_counter = self.row_counter + 1
+
+    def create_controls(self):
+
+        frm = ttk.Frame(self)
+        buttons = {'hello': None, 'hi': None}
+        frm.grid(row=self.row_counter,column=0)
+        self.row_counter = self.row_counter + 1
+
+
+    def create_button_box(self, master, button_dict):
+        frm = ttk.Frame(master)
+        for label, cmd in button_dict.items():
+            btn = ttk.Button(frm, text=label, command=cmd)
+            btn.pack()
+        return frm
+
+
