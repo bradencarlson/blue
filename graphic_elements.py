@@ -359,12 +359,23 @@ class OperationTab(LinkTab):
         # for my own reference, declare what children this Tab will keep track
         # of, and what type they are.
 
+        self.master = master
+        self.tab_list = [] # list of tabs from self.master
+        master.bind("<<NotebookTabChanged>>", self.update_tab_list)
+
         self.output = None # Text()
 
-        self.row_counter = 1
+        self.row_counter = 1 # int (obviously)
+
+        # Create the layout for this tab
 
         self.create_output_area()
         self.create_controls()
+
+    def update_tab_list(self,event):
+        self.tab_list = self.master.tabs()
+        self.create_controls()
+        print(self.tab_list)
 
 
     def save_file(self):
@@ -385,6 +396,11 @@ class OperationTab(LinkTab):
     def create_controls(self):
 
         frm = ttk.Frame(self)
+
+        var = StringVar()
+        file1 = ttk.OptionMenu(frm, var, *self.tab_list)
+        file1.pack()
+
         buttons = {'hello': partial(log,"hello"), 'hi': partial(log,"hi")}
         button_box = self.create_button_box(frm, buttons,"h")
         button_box.pack()
