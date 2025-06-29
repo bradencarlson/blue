@@ -366,6 +366,7 @@ class OperationTab(LinkTab):
         self.create_output_area()
         self.create_controls()
 
+
     def save_file(self):
         """ This should take the output of what ever command has been run and save it
         to a file. """
@@ -379,22 +380,33 @@ class OperationTab(LinkTab):
 
         self.grid_rowconfigure(self.row_counter, weight=1)
 
-        self.output.grid(row=self.row_counter, column=0, sticky="NS")
-        self.row_counter = self.row_counter + 1
+        self.output.grid(row=self.row_counter, column=1, sticky="NS")
 
     def create_controls(self):
 
         frm = ttk.Frame(self)
-        buttons = {'hello': None, 'hi': None}
-        frm.grid(row=self.row_counter,column=0)
-        self.row_counter = self.row_counter + 1
+        buttons = {'hello': partial(log,"hello"), 'hi': partial(log,"hi")}
+        button_box = self.create_button_box(frm, buttons,"h")
+        button_box.pack()
+        frm.grid(row=self.row_counter,column=0,sticky="NS")
 
 
-    def create_button_box(self, master, button_dict):
+    def create_button_box(self, master, button_dict, orientation):
+        """ Creates a ttk.Frame which contains the buttons defined in the
+        button_dict.  The buttons may be layed out in a row or in a column,
+        which is controlled by the orientation parameter, which may be one of
+        the values "vertical", "v", "horizontal", or "h". 
+
+        Since there may be widgets which contains rows or columns of buttons,
+        the master of this widget may be specified with the master parameter. """
+
         frm = ttk.Frame(master)
         for label, cmd in button_dict.items():
             btn = ttk.Button(frm, text=label, command=cmd)
-            btn.pack()
+            if orientation == "vertical" or orientation=="v":
+                btn.pack(side="top",pady=2)
+            elif orientation == "horizontal" or orientation == "h":
+                btn.pack(side="left",padx=3)
         return frm
 
 
