@@ -25,7 +25,7 @@ contains a Text object to be used to view and modify files. The constructor
 for this class has some keyword arguments, which are described in the class
 definition. """
 
-from tkinter import Menu, Menubutton, StringVar, Text
+from tkinter import Menu, Menubutton, StringVar, Text, LEFT
 from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
@@ -441,9 +441,27 @@ class OperationTab(LinkTab):
 
         frm = ttk.Frame(self)
 
+        file1_label = ttk.Label(frm,text="Choose first file:",
+                                anchor="w",width=50)
+
+        file1_label.pack()
+
         var = StringVar()
         file1 = ttk.OptionMenu(frm, var, *self.tab_list)
+
         file1.pack(pady=5)
+
+        file2_label = ttk.Label(frm, text="Choose second file:", 
+                                anchor="w", width=50)
+
+        file2_label.pack()
+
+        file2_var = StringVar()
+        file2 = ttk.OptionMenu(frm, file2_var, *self.tab_list)
+
+        file2.pack()
+
+        
 
         buttons = {'hello': partial(log,"hello"), 'hi': partial(log,"hi")}
         button_box = self.create_button_box(frm, buttons,"h")
