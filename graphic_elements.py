@@ -53,10 +53,11 @@ class LinkNotebook(ttk.Notebook):
         self.tab_list = []
 
     def add_tab(self, **kwargs):
-        """ Adds a tab to the notebook. Currently the accepted keywords are
-        * kind -  what kind of tab this will be, the accepted values for this are
+        """ Adds a tab to the notebook. A star indicates a required parameter. 
+        Currently the accepted keywords are
+          * kind -  what kind of tab this will be, the accepted values for this are
                   currently "TextTab"
-          text -  the text label which will appear on the tab. """
+            text -  the text label which will appear on the tab. """
 
         try:
             if kwargs['kind'] == "TextTab":
@@ -413,8 +414,12 @@ class OperationTab(LinkTab):
 
     def update_tab_list(self,event):
         self.tab_list = self.master.tabs()
+        # Destroy the contols frame before recreating it, this is HIGHLY
+        # dependent on the order in which create_output_area and create_controls
+        # are called and should eventually be changed to make sure that the
+        # controls frame is really the one being removed here. 
+        self.winfo_children()[2].destroy()
         self.create_controls()
-        print(self.tab_list)
 
 
     def save_file(self):
@@ -438,11 +443,11 @@ class OperationTab(LinkTab):
 
         var = StringVar()
         file1 = ttk.OptionMenu(frm, var, *self.tab_list)
-        file1.pack()
+        file1.pack(pady=5)
 
         buttons = {'hello': partial(log,"hello"), 'hi': partial(log,"hi")}
         button_box = self.create_button_box(frm, buttons,"h")
-        button_box.pack()
+        button_box.pack(pady=5)
         frm.grid(row=self.row_counter,column=0,sticky="NS")
 
 
