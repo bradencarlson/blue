@@ -48,6 +48,10 @@ class LinkNotebook(ttk.Notebook):
         super().__init__(master)
         self.style()
 
+        # I don't think that there is any way to acces the content of the tabs
+        # in the ttk.Notebook class, so let's keep track of a list of the Tabs. 
+        self.tab_list = []
+
     def add_tab(self, **kwargs):
         """ Adds a tab to the notebook. Currently the accepted keywords are
         * kind -  what kind of tab this will be, the accepted values for this are
@@ -61,14 +65,29 @@ class LinkNotebook(ttk.Notebook):
                     self.add(new_tab, text=kwargs['text'])
                 except KeyError:
                     self.add(new_tab, "New Tab")
+
+                # Add this tab to the tab_list
+                self.tab_list.append(new_tab)
             elif kwargs['kind'] == "OperationTab":
                 new_tab = OperationTab(self,**kwargs)
                 try:
                     self.add(new_tab, text=kwargs['text'])
                 except KeyError:
                     self.add(new_tab, "New Tab")
+
+                # Add this tab to the tab_list
+                self.tab_list.append(new_tab)
         except KeyError as e:
             fatal(e)
+
+    def get_tab(self, index):
+        """ Return the LinkTab object at index, or None if index is out of
+        bounds. """
+
+        try: 
+            return self.tab_list[index]
+        except IndexError:
+            return None
 
     def style(self):
         """ Sets the style for most of the widgets that this class and it's

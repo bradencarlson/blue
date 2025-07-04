@@ -49,9 +49,3 @@ def difference(file1, file2, **opts):
         print(e)
 
     return nonmatches
-
-
-nonmatches = difference("master.txt", "accepted.txt")
-print(nonmatches)
-
-
