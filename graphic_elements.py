@@ -30,8 +30,9 @@ from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
 from logging import log, fatal
-import re
 import colors as color
+import fops as fo
+import re
 
 class LinkNotebook(ttk.Notebook):
     """ A notebook to hold tabs for the user. Currently this class has the
@@ -315,25 +316,39 @@ class TextTab(LinkTab):
         if not messagebox.askyesno("Are you sure?", msg):
             return
 
-        # mark this point as a point the user can jump back to with the Undo
-        # button
-        self.textarea.edit_separator()
+        # mark this point
+        self.mark_jump_point()
 
-        content = self.textarea.get(1.0,"end")
-        content = re.sub(r"([a-zA-Z]+)",lambda m: m.group(0).capitalize(),content)
-        self.textarea.replace(1.0,"end",content)
+        content = self.get_content()
+        content = fo.capitalize_words(content)
+        self.replace(1.0,"end",content)
 
     def sort(self):
         """ Sort lines of the textbox """
 
-        # mark this point as a point the user can jump back to with the Undo
-        # button
+        # mark this point
+        self.mark_jump_point()
+        s = self.get_content()
+        s = fo.sort_lines(s)
+        self.replace(1.0,"end-1c",s)
+
+    def mark_jump_point(self):
+        """ Make the point at which this is called a place the user can jump
+        back to useing the undo and redo buttons. The command to do this wasn't
+        long, but does not have a very intuitive name. """
+
         self.textarea.edit_separator()
 
-        content = self.textarea.get(1.0,"end").splitlines()
-        content.sort()
-        content = [x for x in content if x != '']
-        self.textarea.replace(1.0,"end","\n".join(content))
+    def get_lines(self):
+        """ Get the content of the text area, as a list of strings, each
+        of which is a line of the file. """
+
+        return self.get_content().splitlines()
+
+    def get_content(self):
+        """ Get the content of the text area, as a single string. """
+
+        return self.textarea.get(1.0,"end-1c")
 
     def undo(self):
         """ Use the undo feature from the textbox. """
@@ -342,6 +357,11 @@ class TextTab(LinkTab):
     def redo(self):
         """ Use the redo feature from the textbox. """
         self.textarea.edit_redo()
+
+    def replace(self, start, end, string):
+        """ Call the replace method of the textarea in this tab. """
+        self.textarea.delete(start,end)
+        self.textarea.insert(start,string)
 
 
 
