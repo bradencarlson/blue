@@ -90,6 +90,14 @@ class LinkNotebook(ttk.Notebook):
         except IndexError:
             return None
 
+    def get_text_tabs(self):
+        """ Returns a list of all the TextTabs which are contained in this
+        notebook.  This is used in the OperationTab class to allow the user to
+        select files for diffing. """
+
+        tabs = [tab.filename_label.get() for tab in self.tab_list if isinstance(tab, TextTab) ]
+        return tabs
+
     def style(self):
         """ Sets the style for most of the widgets that this class and it's
         children use. This provides a uniform look across the application."""
@@ -407,13 +415,16 @@ class OperationTab(LinkTab):
 
         self.row_counter = 1 # int (obviously)
 
+        self.file1_select = None # ttk.Combobox
+        self.file2_select = None # ttk.Combobox
+
         # Create the layout for this tab
 
         self.create_output_area()
         self.create_controls()
 
     def update_tab_list(self,event):
-        self.tab_list = self.master.tabs()
+        self.tab_list = self.master.get_text_tabs()
         # Destroy the contols frame before recreating it, this is HIGHLY
         # dependent on the order in which create_output_area and create_controls
         # are called and should eventually be changed to make sure that the
@@ -441,32 +452,44 @@ class OperationTab(LinkTab):
 
         frm = ttk.Frame(self)
 
+        # Create the label for the first file 
         file1_label = ttk.Label(frm,text="Choose first file:",
                                 anchor="w",width=50)
-
         file1_label.pack()
 
-        var = StringVar()
-        file1 = ttk.OptionMenu(frm, var, *self.tab_list)
+        file1_var = StringVar()
+        file1_var.set("Select a filename")
+        self.file1_select = ttk.Combobox(frm,  values=self.tab_list)
 
-        file1.pack(pady=5)
+        self.file1_select.pack(pady=5)
 
+        # Create the label for the second file
         file2_label = ttk.Label(frm, text="Choose second file:", 
                                 anchor="w", width=50)
-
         file2_label.pack()
 
         file2_var = StringVar()
-        file2 = ttk.OptionMenu(frm, file2_var, *self.tab_list)
+        self.file2_select = ttk.Combobox(frm, values=self.tab_list)
 
-        file2.pack()
+        self.file2_select.pack()
 
         
 
-        buttons = {'hello': partial(log,"hello"), 'hi': partial(log,"hi")}
+        buttons = {'Take Difference': self.take_difference} 
         button_box = self.create_button_box(frm, buttons,"h")
         button_box.pack(pady=5)
         frm.grid(row=self.row_counter,column=0,sticky="NS")
+
+    def take_difference(self):
+        idx1 = self.file1_select.current()
+        idx2 = self.file2_select.current()
+
+        if idx1 == -1 or idx2 == -1:
+            return
+
+        self.output.delete(1.0, "end")
+        nonmatches = fo.difference(self.tab_list[idx1], self.tab_list[idx2])
+        self.output.insert(1.0, '\n'.join(nonmatches))
 
 
     def create_button_box(self, master, button_dict, orientation):
