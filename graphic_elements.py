@@ -49,8 +49,10 @@ class LinkNotebook(ttk.Notebook):
         self.style()
 
         # I don't think that there is any way to acces the content of the tabs
-        # in the ttk.Notebook class, so let's keep track of a list of the Tabs. 
+        # in the ttk.Notebook class, so let's keep track of a list of the Tabs,
+        # as well as a list to keep track of their labels. 
         self.tab_list = []
+        self.tab_labels = []
 
     def add_tab(self, **kwargs):
         """ Adds a tab to the notebook. A star indicates a required parameter. 
@@ -64,8 +66,11 @@ class LinkNotebook(ttk.Notebook):
                 new_tab = TextTab(self,**kwargs)
                 try:
                     self.add(new_tab, text=kwargs['text'])
+                    self.tab_labels.append(kwargs['text'])
                 except KeyError:
-                    self.add(new_tab, "New Tab")
+                    label = f"Tab {len(self.tab_list)}"
+                    self.add(new_tab, label)
+                    self.tab_labels.append(label)
 
                 # Add this tab to the tab_list
                 self.tab_list.append(new_tab)
@@ -73,8 +78,11 @@ class LinkNotebook(ttk.Notebook):
                 new_tab = OperationTab(self,**kwargs)
                 try:
                     self.add(new_tab, text=kwargs['text'])
+                    self.tab_labels.append(kwargs['text'])
                 except KeyError:
-                    self.add(new_tab, "New Tab")
+                    label = f"Tab {len(self.tab_list)}"
+                    self.add(new_tab, label)
+                    self.tab_labels.append(label)
 
                 # Add this tab to the tab_list
                 self.tab_list.append(new_tab)
@@ -90,13 +98,22 @@ class LinkNotebook(ttk.Notebook):
         except IndexError:
             return None
 
-    def get_text_tabs(self):
+    def get_filenames(self):
         """ Returns a list of all the TextTabs which are contained in this
         notebook.  This is used in the OperationTab class to allow the user to
         select files for diffing. """
 
-        tabs = [tab.filename_label.get() for tab in self.tab_list if isinstance(tab, TextTab) ]
+        tabs = [tab.filename.get() for tab in self.tab_list if isinstance(tab, TextTab) ]
         return tabs
+
+    def get_text_tab_labels(self):
+        """ Returns the list of TextTab labels """
+
+        labels = []
+        for i in range(0,len(self.tab_list)):
+            if isinstance(self.tab_list[i], TextTab):
+                labels.append(self.tab_labels[i])
+        return labels
 
     def style(self):
         """ Sets the style for most of the widgets that this class and it's
@@ -424,7 +441,7 @@ class OperationTab(LinkTab):
         self.create_controls()
 
     def update_tab_list(self,event):
-        self.tab_list = self.master.get_text_tabs()
+        self.tab_list = self.master.get_text_tab_labels()
         # Destroy the contols frame before recreating it, this is HIGHLY
         # dependent on the order in which create_output_area and create_controls
         # are called and should eventually be changed to make sure that the
@@ -457,8 +474,7 @@ class OperationTab(LinkTab):
                                 anchor="w",width=50)
         file1_label.pack()
 
-        file1_var = StringVar()
-        file1_var.set("Select a filename")
+        # Create the Combobox for the first file
         self.file1_select = ttk.Combobox(frm,  values=self.tab_list)
 
         self.file1_select.pack(pady=5)
@@ -468,7 +484,7 @@ class OperationTab(LinkTab):
                                 anchor="w", width=50)
         file2_label.pack()
 
-        file2_var = StringVar()
+        # Create the Combobox for the second file
         self.file2_select = ttk.Combobox(frm, values=self.tab_list)
 
         self.file2_select.pack()
@@ -488,7 +504,9 @@ class OperationTab(LinkTab):
             return
 
         self.output.delete(1.0, "end")
-        nonmatches = fo.difference(self.tab_list[idx1], self.tab_list[idx2])
+        filename_one = self.master.get_filenames()[idx1]
+        filename_two = self.master.get_filenames()[idx2]
+        nonmatches = fo.difference(filename_one, filename_two)
         self.output.insert(1.0, '\n'.join(nonmatches))
 
 

@@ -75,9 +75,3 @@ class Link(Widget):
     def get_tab(index):
         return self.notebook.get_tab(index)
 
-
-
-#root = Tk()
-#root.configure(bg=color.bg)
-#app = Link(root)
-#root.mainloop()
