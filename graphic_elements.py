@@ -418,7 +418,7 @@ class OperationTab(LinkTab):
 
         # Define the menu for the operations tab.
         ops_menu = {'File': {
-            'Close': self.close}}
+            'Close': self.close, 'Save As': self.save_as, 'Save': self.save_file}}
         super().__init__(master,**kwargs,menu=ops_menu)
 
         # for my own reference, declare what children this Tab will keep track
@@ -435,6 +435,9 @@ class OperationTab(LinkTab):
         self.file1_select = None # ttk.Combobox
         self.file2_select = None # ttk.Combobox
 
+        self.filename = StringVar() # String
+        self.filename.set("NONE")
+
         # Create the layout for this tab
 
         self.create_output_area()
@@ -449,10 +452,31 @@ class OperationTab(LinkTab):
         self.winfo_children()[2].destroy()
         self.create_controls()
 
+    def save_as(self): 
+        """ Sets the filename to be NONE so that the save_file method prompts
+        the user for a new one. """
+
+        self.filename.set('NONE')
+        self.save_file()
 
     def save_file(self):
-        """ This should take the output of what ever command has been run and save it
-        to a file. """
+        """ This takes the content of the output text area and saves it to a
+        file.  If the value of self.filename.get() is the string 'NONE', then it
+        prompts the user to choose a file or enter a new filename. """
+        
+        if self.filename.get() == "NONE":
+            self.filename.set(filedialog.asksaveasfilename())
+        
+        try: 
+            with open(self.filename.get(), "w") as f_handle: 
+                f_handle.write(self.output.get(1.0, "end-1c"))
+        except FileExistsError: 
+            log(f"{self.filename.get()} already exists, aborting.")
+            self.filename.set("NONE")
+        except IsADirectoryError:
+            log(f"{self.filename.get()} is a directory, setting filename to NONE so the user can try again.")
+            self.filename.set("NONE")
+
         return
 
     def create_output_area(self):
