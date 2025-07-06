@@ -107,7 +107,7 @@ class LinkNotebook(ttk.Notebook):
         return tabs
 
     def get_text_tab_labels(self):
-        """ Returns the list of TextTab labels """
+        """ Returns a list of TextTab labels """
 
         labels = []
         for i in range(0,len(self.tab_list)):
@@ -459,7 +459,7 @@ class OperationTab(LinkTab):
         """ Puts a text area in the tab so that output from the various commands
         can be viewed and saved if desired. """
 
-        self.output = Text(self)
+        self.output = Text(self,**color.text_style)
 
         self.grid_rowconfigure(self.row_counter, weight=1)
 
@@ -469,25 +469,28 @@ class OperationTab(LinkTab):
 
         frm = ttk.Frame(self)
 
-        # Create the label for the first file 
-        file1_label = ttk.Label(frm,text="Choose first file:",
+        diff_label = ttk.Label(frm, text="Differences", width=50, anchor="w")
+        diff_label.pack()
+
+        # Create the label for the first tab
+        file1_label = ttk.Label(frm,text="Choose first tab:",
                                 anchor="w",width=50)
         file1_label.pack()
 
-        # Create the Combobox for the first file
+        # Create the Combobox for the first tab
         self.file1_select = ttk.Combobox(frm,  values=self.tab_list)
 
         self.file1_select.pack(pady=5)
 
         # Create the label for the second file
-        file2_label = ttk.Label(frm, text="Choose second file:", 
+        file2_label = ttk.Label(frm, text="Choose second tab:", 
                                 anchor="w", width=50)
         file2_label.pack()
 
         # Create the Combobox for the second file
         self.file2_select = ttk.Combobox(frm, values=self.tab_list)
 
-        self.file2_select.pack()
+        self.file2_select.pack(pady=5)
 
         
 
