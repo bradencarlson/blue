@@ -29,7 +29,7 @@ from tkinter import Menu, Menubutton, StringVar, Text, LEFT
 from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
-from logging import log, fatal
+from my_logging import log, fatal
 import colors as color
 import fops as fo
 import re

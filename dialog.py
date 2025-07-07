@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter.simpledialog import Dialog, Toplevel, _place_window
-import logging as log
+import my_logging as log
 
 class NewTabDialog(Dialog):
     def __init__(self,master,title=None):
