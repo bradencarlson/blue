@@ -49,3 +49,53 @@ def difference(file1, file2, **opts):
         print(e)
 
     return nonmatches
+
+def cut(filename, **opts):
+    """ Mini implementation of the cut command from Linux. """
+
+    try: 
+        FS = opts['FS']
+    except KeyError: 
+        FS = ","
+
+    if 'f' in opts.keys():
+        nums = parse_num_range(opts['f'])
+
+def parse_num_range(rng):
+    """ Take a string, which represents a range of of numbers, and return a list
+    of the numbers in that range. """
+
+    def parse_range(r):
+        num1 = re.search(r'^[0-9]+',r)
+        num2 = re.search(r'-?[0-9]*$',r)
+
+        num1_start = num1.span()[0] # Should always be zero. 
+        num2_start = num2.span()[0]
+
+        num1_length = num1.span()[1]-num1.span()[0]
+
+        if num1_start == num2_start:
+            start = int(r[num1_start:num1_length ])
+            return [start, start]
+
+        # Minus one here since the match includes the 
+        num2_length = num2.span()[1] - num2.span()[0] - 1
+
+        start = int(r[num1_start: num1_start + num1_length])
+        end = int(r[num2_start + 1: num2_start +1 + num2_length ])
+
+        return [start, end]
+
+        
+    ranges = []
+
+    rng = re.sub(r'\s+','',rng)
+    print(rng)
+
+    if re.search(r',',rng):
+        lst = re.split(r',', rng)
+        for r in lst: 
+            [start, end] = parse_range(r)
+            ranges.append(list(range(start, end + 1)))
+
+    return ranges
