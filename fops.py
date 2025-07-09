@@ -87,7 +87,7 @@ def parse_num_range(rng):
         return [start, end]
 
         
-    ranges = []
+    nums = []
 
     rng = re.sub(r'\s+','',rng)
     print(rng)
@@ -96,6 +96,11 @@ def parse_num_range(rng):
         lst = re.split(r',', rng)
         for r in lst: 
             [start, end] = parse_range(r)
-            ranges.append(list(range(start, end + 1)))
-
-    return ranges
+            for i in range(start, end + 1): 
+                nums.append(i)
+    else: 
+        [start, end] = parse_range(rng)
+        for i in range(start, end + 1): 
+            nums.append(i)
+        
+    return nums
