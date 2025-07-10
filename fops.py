@@ -50,8 +50,11 @@ def difference(file1, file2, **opts):
 
     return nonmatches
 
-def cut(filename, **opts):
+def cut(string, **opts):
     """ Mini implementation of the cut command from Linux. """
+
+    lines = string.splitlines()
+    new_lines = []
 
     try: 
         FS = opts['FS']
@@ -60,12 +63,27 @@ def cut(filename, **opts):
 
     if 'f' in opts.keys():
         nums = parse_num_range(opts['f'])
+        max_num = max(nums)
+        for line in lines: 
+            records = re.split(FS, line)
+            NR = len(records)
+            if max_num > NR:
+                print("error")
+            new_line = FS.join([records[i-1] for i in nums])
+            new_lines.append(new_line)
+        new_string = '\n'.join(new_lines)
+        return new_string
+
 
 def parse_num_range(rng):
     """ Take a string, which represents a range of of numbers, and return a list
     of the numbers in that range. """
 
     def parse_range(r):
+        """ This method actually does the parsing of the range. It takes a
+        single range (i.e. 3-5) and returns all numbers in that range as an
+        array (i.e. [3,4,5]). """
+
         num1 = re.search(r'^[0-9]+',r)
         num2 = re.search(r'-?[0-9]*$',r)
 
