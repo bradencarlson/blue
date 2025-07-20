@@ -87,6 +87,9 @@ def parse_num_range(rng):
         num1 = re.search(r'^[0-9]+',r)
         num2 = re.search(r'-?[0-9]*$',r)
 
+        if num1 is None: 
+            return 0
+
         num1_start = num1.span()[0] # Should always be zero. 
         num2_start = num2.span()[0]
 
@@ -108,7 +111,6 @@ def parse_num_range(rng):
     nums = []
 
     rng = re.sub(r'\s+','',rng)
-    print(rng)
 
     if re.search(r',',rng):
         lst = re.split(r',', rng)

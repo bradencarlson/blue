@@ -32,6 +32,7 @@ from functools import partial
 from logging import log, fatal
 import colors as color
 import fops as fo
+import dialog as dlg
 import re
 
 class LinkNotebook(ttk.Notebook):
@@ -237,7 +238,8 @@ class TextTab(LinkTab):
                               "Capitalize": self.capitalize_names,
                               "Sort": self.sort,
                               "Undo": self.undo,
-                              "Redo": self.redo }}
+                              "Redo": self.redo, 
+                              "Cut": self.cut}}
 
         super().__init__(master, **kwargs, menu=default_menu_dict)
 
@@ -407,6 +409,13 @@ class TextTab(LinkTab):
         """ Call the replace method of the textarea in this tab. """
         self.textarea.delete(start,end)
         self.textarea.insert(start,string)
+
+    def cut(self): 
+        rng = dlg.ask_num_range(self)
+        content = self.get_content()
+        new_content = fo.cut(content,f=rng)
+        self.replace(1.0,"end", new_content)
+        print(rng)
 
 
 
