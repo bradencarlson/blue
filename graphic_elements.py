@@ -407,11 +407,18 @@ class TextTab(LinkTab):
 
     def replace(self, start, end, string):
         """ Call the replace method of the textarea in this tab. """
+        self.mark_jump_point()
         self.textarea.delete(start,end)
         self.textarea.insert(start,string)
 
     def cut(self): 
         rng = dlg.ask_num_range(self)
+
+        # ask_num_range returns a list with a single entry (-1) when the user
+        # hits the cancel button. In this case, just stop here. 
+        if rng[0] == -1:
+            return 
+
         content = self.get_content()
         new_content = fo.cut(content,f=rng)
         self.replace(1.0,"end", new_content)
