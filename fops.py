@@ -7,6 +7,7 @@ will need while useing this application.
 """
 
 import re
+from dialog import error
 
 def sort_lines(string):
     """ sorts lines in a string. """
@@ -50,6 +51,29 @@ def difference(file1, file2, **opts):
 
     return nonmatches
 
+def get_num_fields(lines, **opts):
+    MAX_NUMBER_OF_RECORDS = 1000
+
+    try: 
+        FS = opts['FS']
+    except KeyError:
+        FS = ","
+
+    MNR = MAX_NUMBER_OF_RECORDS
+    lineno= 1
+    index = 1
+    for line in lines:
+        records = re.split(FS, line)
+        if len(records) <= MNR:
+            MNR = len(records)
+            lineno = index
+        index = index + 1
+
+    if lineno < len(lines):
+        error(None, f"There is probably a problem with the data, check line number {lineno}")
+    return [MNR, lineno]
+        
+
 def cut(string, **opts):
     """ Mini implementation of the cut command from Linux. """
 
@@ -61,16 +85,25 @@ def cut(string, **opts):
     except KeyError: 
         FS = ","
 
+    [MNR,lineno] = get_num_fields(lines, FS=FS)
+
     if 'f' in opts.keys():
         nums = parse_num_range(opts['f'])
         max_num = max(nums)
+        if max_num > MNR:
+            print("invalid range given")
+            return '\n'.join(lines)
+
+        index = 1
         for line in lines: 
             records = re.split(FS, line)
             NR = len(records)
             if max_num > NR:
-                print("error")
+                print(f"There was an error on line {index}")
+                return '\n'.join(lines)
             new_line = FS.join([records[i-1] for i in nums])
             new_lines.append(new_line)
+            index = index + 1
         new_string = '\n'.join(new_lines)
         return new_string
 

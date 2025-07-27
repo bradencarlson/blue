@@ -29,7 +29,6 @@ from tkinter import Menu, Menubutton, StringVar, Text, LEFT
 from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
-from logging import log, fatal
 import colors as color
 import fops as fo
 import dialog as dlg
@@ -155,11 +154,11 @@ class LinkTab(ttk.Frame):
         except KeyError:
             # define default menu dictionary for the top of the frame,
             # which does nothing but log stuff.
-            default_menu_dict = {"File": {"New": log('New clicked'),
-                                "Open": log('Open clicked.'),
+            default_menu_dict = {"File": {"New": dlg.log('New clicked'),
+                                "Open": dlg.log('Open clicked.'),
                                 "Close": self.close},
-                         "Edit": {"Copy": log("Copy clicked"),
-                                  "Paste": log("Paste clicked")
+                         "Edit": {"Copy": dlg.log("Copy clicked"),
+                                  "Paste": dlg.log("Paste clicked")
                                   }}
             menu = self.create_menubar(default_menu_dict)
 
@@ -204,8 +203,8 @@ class LinkTab(ttk.Frame):
                 f_handle = open(filename, permissions)
                 return f_handle
             except FileNotFoundError as e:
-                log(f"{e}")
-                log("Asking user to select a file.")
+                dlg.log(f"{e}")
+                dlg.log("Asking user to select a file.")
                 filename = filedialog.askopenfilename()
                 # if the user selects cancel do nothing
                 if filename == '':
@@ -233,8 +232,8 @@ class TextTab(LinkTab):
                               "Open": partial(self.open_file,"NONE", "r+"),
                               "Save": self.save_file,
                               "Close": self.close},
-                     "Edit": {"Copy": partial(log, "Copy clicked"),
-                              "Paste": partial(log,"Paste clicked"),
+                     "Edit": {"Copy": partial(dlg.log, "Copy clicked"),
+                              "Paste": partial(dlg.log,"Paste clicked"),
                               "Capitalize": self.capitalize_names,
                               "Sort": self.sort,
                               "Undo": self.undo,
@@ -331,11 +330,11 @@ class TextTab(LinkTab):
         try:
             f_handle = open(self.filename.get(), "w")
         except FileNotFoundError:
-            log(f"{self.filename} was not found.")
-            log(e)
+            dlg.log(f"{self.filename} was not found.")
+            dlg.log(e)
             return
         except IsADirectoryError:
-            log(f"{self.filename} is a directory, cannot save file.")
+            dlg.log(f"{self.filename} is a directory, cannot save file.")
             return
 
         self.textarea.edit_modified(False)
@@ -411,8 +410,12 @@ class TextTab(LinkTab):
         self.textarea.delete(start,end)
         self.textarea.insert(start,string)
 
-    def cut(self): 
-        rng = dlg.ask_num_range(self)
+    def cut(self,**opts): 
+        rng = None
+        try: 
+            rng = opts["r"]
+        except KeyError:
+            rng = dlg.ask_num_range(self)
 
         # ask_num_range returns a list with a single entry (-1) when the user
         # hits the cancel button. In this case, just stop here. 
@@ -422,7 +425,6 @@ class TextTab(LinkTab):
         content = self.get_content()
         new_content = fo.cut(content,f=rng)
         self.replace(1.0,"end", new_content)
-        print(rng)
 
 
 
