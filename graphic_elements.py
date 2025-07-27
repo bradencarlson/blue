@@ -29,10 +29,6 @@ from tkinter import Menu, Menubutton, StringVar, Text, LEFT
 from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
-<<<<<<< HEAD
-from my_logging import log, fatal
-=======
->>>>>>> cut
 import colors as color
 import fops as fo
 import dialog as dlg
