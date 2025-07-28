@@ -1,4 +1,6 @@
-# Description
+# Blew
+
+## Description
 
 This program was developed to address some common data processing problems
 encountered in the Link Crew program at Lewiston High School, specifically to
@@ -8,7 +10,7 @@ of student applicants, cutting out unnecessary columns of data, and performing
 differences of files (for example, finding all names of students who applied to the
 program, but are not listed in some master file of 10th and 11th graders).
 
-# History
+## History
 
 This project began as a simple script that I wrote for myself to perform these
 tasks, directly relying upon the programs mentioned in the description. This
@@ -16,7 +18,7 @@ script is still included in the project.  However, as the years went on I wanted
 to be able to leave behind something that anyone could use to perform the same
 tasks, and here we are. 
 
-# Examples
+## Examples
 
 The following are examples of using the script that I originally wrote for
 myself.
@@ -48,7 +50,7 @@ or
 
 > link-crew.sh -c accepted.txt --backup
 
-# Getting Help
+## Getting Help
 
 Unfortunately, no documentation currently exists, I am working on it!
 

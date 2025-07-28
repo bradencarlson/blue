@@ -18,7 +18,7 @@ class Link(Widget):
         self.notebook.pack(fill="both", expand=True)
         self.pack(fill="both", expand=True)
 
-        menu_dict = {"Slinky": {'Close': self.close},
+        menu_dict = {"Blew": {'Close': self.close},
                      "View": {'Add Tab': self.add_tab}}
         self.create_menu(menu_dict)
 
