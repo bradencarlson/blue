@@ -25,7 +25,8 @@ contains a Text object to be used to view and modify files. The constructor
 for this class has some keyword arguments, which are described in the class
 definition. """
 
-from tkinter import Menu, Menubutton, StringVar, Text, LEFT
+from tkinter import Menu, Menubutton, StringVar, Text, LEFT, Scrollbar
+from tkinter import INSERT 
 from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
@@ -246,12 +247,14 @@ class TextTab(LinkTab):
         self.filename_label.set("New File")
         self.filename = StringVar()
         self.textarea = None
+        self.scrollbar = None
 
         # start counting rows at 1, since the menu (placed by
         # super().__init__() ) is at row 0.
         self.row_counter = 1
 
         self.create_filename_label()
+
 
         try:
             self.textarea = self.create_file_area(kwargs['textwidth'])
@@ -264,8 +267,11 @@ class TextTab(LinkTab):
         frame in which the text box is placed, as well as the text box itself, so that
         the content of the text box can be updated from outside this function. """
 
-        txt = Text(self, undo=True, **color.text_style)
+        self.scrollbar = Scrollbar(self, cursor="arrow", command =self.scroll)
+        txt = Text(self, undo=True, **color.text_style,
+                   yscrollcommand=self.scrollbar.set)
         txt.grid(row=self.row_counter,column=0,sticky="NSEW",padx=5,pady=2)
+        self.scrollbar.grid(row=self.row_counter, column=1, sticky="NS")
         self.row_counter = self.row_counter + 1
 
         # Bind this textbox to the <<Modified>> event, which will call the
@@ -319,6 +325,7 @@ class TextTab(LinkTab):
         if self.textarea.edit_modified():
             if not self.filename_label.get().endswith("*"):
                 self.filename_label.set(self.filename_label.get() + "*")
+
 
     def save_file(self):
         """ Saves the file.  This is as simple as using the current filename (from
@@ -425,6 +432,24 @@ class TextTab(LinkTab):
         content = self.get_content()
         new_content = fo.cut(content,f=rng)
         self.replace(1.0,"end", new_content)
+
+    def scroll(self,*args):
+        if len(args) == 2:
+            # should be something like ("moveto", 'number')
+            percent = float(args[1])
+            self.textarea.yview("moveto", percent)
+        if len(args) == 3:
+            # should be something like ("move", 'num', "units")
+            # TODO
+            if args[1] == "1":
+                view = self.textarea.yview()
+                self.textarea.yview("moveto", view[1])
+                self.scrollbar.set(view[1], view[1] + (view[1]-view[0]))
+            if args[1] == "-1":
+                view = self.textarea.yview()
+                diff = view[1] - view[0]
+                self.textarea.yview("moveto", view[0] - diff )
+                self.scrollbar.set(view[0],view[1])
 
 
 
