@@ -1,6 +1,6 @@
 # Blue
 
-![Pylint Badge](https://github.com/bradencarlson/blue/workflows/pylint.yml/badge.svg)
+![Pylint Badge](https://github.com/bradencarlson/blue/actions/workflows/pylint.yml/badge.svg)
 
 ## Description
 
