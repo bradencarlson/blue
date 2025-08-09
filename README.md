@@ -1,5 +1,7 @@
 # Blue
 
+![Pylint Badge](https://github.com/bradencarlson/blue/actions/workflows/pylint.yml/badge.svg)
+
 ## Description
 
 This program was developed to address some common data processing problems
