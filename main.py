@@ -1,3 +1,15 @@
+""" main.py
+Author: Braden Carlson <bradenjcarlson@live.com>
+
+Defines the Link class, which is the top level widget after root to be called
+when implementing this application. This class contains a ttk.Notebook child,
+which contains tabs for files, as well as tabs for file operations. Everything
+that can be done with this program should be able to be performed both
+graphically as well as programmatically, in a simple easy to understand manner.
+Therefor, many of the methods in this class are simply wrappers to their
+corresponding methods in the TextTab and OperationTab classes which are the
+children of the Notebook contained in this class.  """
+
 from tkinter import Widget, Menu
 from graphic_elements import LinkNotebook
 import colors as color
@@ -68,10 +80,15 @@ class Link(Widget):
         super().quit()
 
     def current_tab(self):
+        """ Return the currently selected tab. This returns the actual object,
+        so that it's methods can be called. """
+
         tab_id = self.notebook.select()
         index = self.notebook.index(tab_id)
         return self.notebook.get_tab(index)
 
-    def get_tab(index):
-        return self.notebook.get_tab(index)
+    def get_tab(self, index):
+        """ Similar to the current_tab method, but returns the tab at the
+        specified index. """
 
+        return self.notebook.get_tab(index)

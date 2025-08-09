@@ -1,4 +1,4 @@
-"""
+""" fops.py
 Author: Braden Carlson
 Date: June 2025
 
@@ -34,45 +34,48 @@ def difference(file1, file2, **opts):
     nonmatches = []
 
     try:
-        with open(file1,"r") as f1:
-            f2 = open(file2, "r")
-            f2_text = f2.read()
-            line = f1.readline()
-            while line: 
-                line = line.removesuffix('\n')
-                match = re.findall(line, f2_text)
-                if len(match) == 0:
-                    nonmatches.append(line)
-                else: 
-                    matches.append(line)
+        with open(file1,"r",encoding="utf-8") as f1:
+            with open(file2, "r", encoding="utf-8") as f2:
+                f2_text = f2.read()
                 line = f1.readline()
-    except Exception as e:
-        print(e)
+                while line:
+                    line = line.removesuffix('\n')
+                    match = re.findall(line, f2_text)
+                    if len(match) == 0:
+                        nonmatches.append(line)
+                    else:
+                        matches.append(line)
+                    line = f1.readline()
+    except FileNotFoundError: 
+        error(f"One of {file1} or {file2} does not exist.")
 
     return nonmatches
 
 def get_num_fields(lines, **opts):
-    MAX_NUMBER_OF_RECORDS = 1000
+    """ Get the smalled number of records which appears in any line of the file.
+    This is used in the cut method to ensure that the range attained from the
+    user does not go out of bounds. """
 
-    try: 
-        FS = opts['FS']
+    max_number_of_records = 1000
+
+    try:
+        fs = opts['FS']
     except KeyError:
-        FS = ","
+        fs = ","
 
-    MNR = MAX_NUMBER_OF_RECORDS
+    mnr = max_number_of_records
     lineno= 1
     index = 1
     for line in lines:
-        records = re.split(FS, line)
-        if len(records) <= MNR:
-            MNR = len(records)
+        records = re.split(fs, line)
+        if len(records) <= mnr:
+            mnr = len(records)
             lineno = index
         index = index + 1
 
     if lineno < len(lines):
         error(None, f"There is probably a problem with the data, check line number {lineno}")
-    return [MNR, lineno]
-        
+    return [mnr, lineno]
 
 def cut(string, **opts):
     """ Mini implementation of the cut command from Linux. """
@@ -80,28 +83,28 @@ def cut(string, **opts):
     lines = string.splitlines()
     new_lines = []
 
-    try: 
-        FS = opts['FS']
-    except KeyError: 
-        FS = ","
+    try:
+        fs = opts['fs']
+    except KeyError:
+        fs = ","
 
-    [MNR,lineno] = get_num_fields(lines, FS=FS)
+    mnr = get_num_fields(lines, fs=fs)[0]
 
     if 'f' in opts.keys():
         nums = parse_num_range(opts['f'])
         max_num = max(nums)
-        if max_num > MNR:
+        if max_num > mnr:
             print("invalid range given")
             return '\n'.join(lines)
 
         index = 1
-        for line in lines: 
-            records = re.split(FS, line)
-            NR = len(records)
-            if max_num > NR:
+        for line in lines:
+            records = re.split(fs, line)
+            nr = len(records)
+            if max_num > nr:
                 print(f"There was an error on line {index}")
                 return '\n'.join(lines)
-            new_line = FS.join([records[i-1] for i in nums])
+            new_line = fs.join([records[i-1] for i in nums])
             new_lines.append(new_line)
             index = index + 1
         new_string = '\n'.join(new_lines)
@@ -120,10 +123,10 @@ def parse_num_range(rng):
         num1 = re.search(r'^[0-9]+',r)
         num2 = re.search(r'-?[0-9]*$',r)
 
-        if num1 is None: 
+        if num1 is None:
             return 0
 
-        num1_start = num1.span()[0] # Should always be zero. 
+        num1_start = num1.span()[0] # Should always be zero.
         num2_start = num2.span()[0]
 
         num1_length = num1.span()[1]-num1.span()[0]
@@ -132,7 +135,7 @@ def parse_num_range(rng):
             start = int(r[num1_start:num1_length ])
             return [start, start]
 
-        # Minus one here since the match includes the 
+        # Minus one here since the match includes the
         num2_length = num2.span()[1] - num2.span()[0] - 1
 
         start = int(r[num1_start: num1_start + num1_length])
@@ -140,20 +143,19 @@ def parse_num_range(rng):
 
         return [start, end]
 
-        
     nums = []
 
     rng = re.sub(r'\s+','',rng)
 
     if re.search(r',',rng):
         lst = re.split(r',', rng)
-        for r in lst: 
+        for r in lst:
             [start, end] = parse_range(r)
-            for i in range(start, end + 1): 
+            for i in range(start, end + 1):
                 nums.append(i)
-    else: 
+    else:
         [start, end] = parse_range(rng)
-        for i in range(start, end + 1): 
+        for i in range(start, end + 1):
             nums.append(i)
-        
+
     return nums

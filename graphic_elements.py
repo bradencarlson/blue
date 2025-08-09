@@ -25,15 +25,14 @@ contains a Text object to be used to view and modify files. The constructor
 for this class has some keyword arguments, which are described in the class
 definition. """
 
-from tkinter import Menu, Menubutton, StringVar, Text, LEFT, Scrollbar
-from tkinter import INSERT 
+from tkinter import Menu, Menubutton, StringVar, Text, Scrollbar
 from tkinter import ttk
 from tkinter import filedialog, messagebox
 from functools import partial
+import re
 import colors as color
 import fops as fo
 import dialog as dlg
-import re
 
 class LinkNotebook(ttk.Notebook):
     """ A notebook to hold tabs for the user. Currently this class has the
@@ -51,7 +50,7 @@ class LinkNotebook(ttk.Notebook):
 
         # I don't think that there is any way to acces the content of the tabs
         # in the ttk.Notebook class, so let's keep track of a list of the Tabs,
-        # as well as a list to keep track of their labels. 
+        # as well as a list to keep track of their labels.
         self.tab_list = []
         self.tab_labels = []
 
@@ -70,7 +69,7 @@ class LinkNotebook(ttk.Notebook):
                     self.tab_labels.append(kwargs['text'])
                 except KeyError:
                     label = f"Tab {len(self.tab_list)}"
-                    self.add(new_tab, label)
+                    self.add(new_tab, text=label)
                     self.tab_labels.append(label)
 
                 # Add this tab to the tab_list
@@ -82,19 +81,19 @@ class LinkNotebook(ttk.Notebook):
                     self.tab_labels.append(kwargs['text'])
                 except KeyError:
                     label = f"Tab {len(self.tab_list)}"
-                    self.add(new_tab, label)
+                    self.add(new_tab, text=label)
                     self.tab_labels.append(label)
 
                 # Add this tab to the tab_list
                 self.tab_list.append(new_tab)
         except KeyError as e:
-            fatal(e)
+            dlg.fatal(e)
 
     def get_tab(self, index):
         """ Return the LinkTab object at index, or None if index is out of
         bounds. """
 
-        try: 
+        try:
             return self.tab_list[index]
         except IndexError:
             return None
@@ -111,9 +110,9 @@ class LinkNotebook(ttk.Notebook):
         """ Returns a list of TextTab labels """
 
         labels = []
-        for i in range(0,len(self.tab_list)):
-            if isinstance(self.tab_list[i], TextTab):
-                labels.append(self.tab_labels[i])
+        for index, item in enumerate(self.tab_list):
+            if isinstance(item, TextTab):
+                labels.append(self.tab_labels[index])
         return labels
 
     def style(self):
@@ -122,20 +121,20 @@ class LinkNotebook(ttk.Notebook):
 
         s = ttk.Style()
         s.map("TNotebook.Tab",
-                    background=[('selected', color.bg)],
-                    foreground=[('selected', color.fg)])
+                    background=[('selected', color.BG)],
+                    foreground=[('selected', color.FG)])
         s.configure("TNotebook.Tab",
-                    background=color.bg_inactive,
-                    foreground=color.fg_inactive,
+                    background=color.BG_INACTIVE,
+                    foreground=color.FG_INACTIVE,
                     padding=[10,5])
         s.configure("TFrame",
-                    background=color.bg,
-                    foreground=color.fg,
+                    background=color.BG,
+                    foreground=color.FG,
                     borderwidth=0,
                     relief="flat")
         s.configure("TLabel",
-                    background=color.bg,
-                    foreground=color.fg,
+                    background=color.BG,
+                    foreground=color.FG,
                     padding=[10,5])
 
 class LinkTab(ttk.Frame):
@@ -201,6 +200,7 @@ class LinkTab(ttk.Frame):
         f_handle = 0
         while not f_handle:
             try:
+                # pylint: disable=W1514,R1732
                 f_handle = open(filename, permissions)
                 return f_handle
             except FileNotFoundError as e:
@@ -209,7 +209,7 @@ class LinkTab(ttk.Frame):
                 filename = filedialog.askopenfilename()
                 # if the user selects cancel do nothing
                 if filename == '':
-                    return ''
+                    return None
 
     def close(self):
         """ Close the current tab (self) """
@@ -257,7 +257,7 @@ class TextTab(LinkTab):
 
 
         try:
-            self.textarea = self.create_file_area(kwargs['textwidth'])
+            self.textarea = self.create_file_area()
         except KeyError:
             self.textarea = self.create_file_area()
         super().grid_rowconfigure(self.row_counter - 1, weight=1)
@@ -317,6 +317,7 @@ class TextTab(LinkTab):
         self.textarea.edit_modified(False)
 
 
+    # pylint: disable=W0613
     def on_modified(self, event):
         """ Method to call when the textbox on this tab is modified. It simply takes
         the curent filename_label and adds a * to the end, if there is not one
@@ -335,10 +336,10 @@ class TextTab(LinkTab):
             self.filename.set(filedialog.asksaveasfilename())
             self.filename_label.set(re.sub(r"(.*)/([^/]*)$",r'\2',self.filename.get()))
         try:
-            f_handle = open(self.filename.get(), "w")
+            # pylint: disable=W1514,R1732
+            f_handle = open(self.filename.get(), "w", encoding='utf-8')
         except FileNotFoundError:
             dlg.log(f"{self.filename} was not found.")
-            dlg.log(e)
             return
         except IsADirectoryError:
             dlg.log(f"{self.filename} is a directory, cannot save file.")
@@ -358,7 +359,6 @@ class TextTab(LinkTab):
         self.filename.set('')
         self.textarea.edit_modified(False)
         self.filename_label.set("New File")
-        return
 
     def capitalize_names(self):
         """ Capitalize each word of the current file. Send a warning to the user first
@@ -417,30 +417,34 @@ class TextTab(LinkTab):
         self.textarea.delete(start,end)
         self.textarea.insert(start,string)
 
-    def cut(self,**opts): 
+    def cut(self,**opts):
+        """ Call the cut method of the fops module on the current text. """
         rng = None
-        try: 
+        try:
             rng = opts["r"]
         except KeyError:
             rng = dlg.ask_num_range(self)
 
         # ask_num_range returns a list with a single entry (-1) when the user
-        # hits the cancel button. In this case, just stop here. 
+        # hits the cancel button. In this case, just stop here.
         if rng[0] == -1:
-            return 
+            return
 
         content = self.get_content()
         new_content = fo.cut(content,f=rng)
         self.replace(1.0,"end", new_content)
 
     def scroll(self,*args):
+        """ Command that is performed when the scrollbar is moved or one of it's
+        buttons is clicked, This adjusts the view of the file to match that of
+        the scrollbar. """
+
         if len(args) == 2:
             # should be something like ("moveto", 'number')
             percent = float(args[1])
             self.textarea.yview("moveto", percent)
         if len(args) == 3:
             # should be something like ("move", 'num', "units")
-            # TODO
             if args[1] == "1":
                 view = self.textarea.yview()
                 self.textarea.yview("moveto", view[1])
@@ -458,6 +462,8 @@ class OperationTab(LinkTab):
     line) which are contained in the other tabs of the app. """
 
     def __init__(self,master, **kwargs):
+        """ Initialize the Operation tab. This defines the default menu for the
+        tab. """
 
         # Define the menu for the operations tab.
         ops_menu = {'File': {
@@ -487,15 +493,19 @@ class OperationTab(LinkTab):
         self.create_controls()
 
     def update_tab_list(self,event):
+        """ Updates the list of tab names found in the ComboBoxes. Frist it
+        retreives the list of TextTab lables from the Notebook, then deletes
+        controls and recreates them. """
+
         self.tab_list = self.master.get_text_tab_labels()
         # Destroy the contols frame before recreating it, this is HIGHLY
         # dependent on the order in which create_output_area and create_controls
         # are called and should eventually be changed to make sure that the
-        # controls frame is really the one being removed here. 
+        # controls frame is really the one being removed here.
         self.winfo_children()[2].destroy()
         self.create_controls()
 
-    def save_as(self): 
+    def save_as(self):
         """ Sets the filename to be NONE so that the save_file method prompts
         the user for a new one. """
 
@@ -506,21 +516,18 @@ class OperationTab(LinkTab):
         """ This takes the content of the output text area and saves it to a
         file.  If the value of self.filename.get() is the string 'NONE', then it
         prompts the user to choose a file or enter a new filename. """
-        
         if self.filename.get() == "NONE":
             self.filename.set(filedialog.asksaveasfilename())
-        
-        try: 
-            with open(self.filename.get(), "w") as f_handle: 
+        try:
+            with open(self.filename.get(), "w", encoding="utf-8") as f_handle:
                 f_handle.write(self.output.get(1.0, "end-1c"))
-        except FileExistsError: 
-            log(f"{self.filename.get()} already exists, aborting.")
+        except FileExistsError:
+            dlg.log(f"{self.filename.get()} already exists, aborting.")
             self.filename.set("NONE")
         except IsADirectoryError:
-            log(f"{self.filename.get()} is a directory, setting filename to NONE so the user can try again.")
+            dlg.log(f"""{self.filename.get()} is a directory, setting filename to
+            NONE so the user can try again.""")
             self.filename.set("NONE")
-
-        return
 
     def create_output_area(self):
         """ Puts a text area in the tab so that output from the various commands
@@ -533,6 +540,9 @@ class OperationTab(LinkTab):
         self.output.grid(row=self.row_counter, column=1, sticky="NS")
 
     def create_controls(self):
+        """ Create the controls to be placed in this tab.  Consctructs two
+        ComboBoxes for selecting TextTabs, as well as some lables instructing
+        the user what to do. """
 
         frm = ttk.Frame(self)
 
@@ -550,7 +560,7 @@ class OperationTab(LinkTab):
         self.file1_select.pack(pady=5)
 
         # Create the label for the second file
-        file2_label = ttk.Label(frm, text="Choose second tab:", 
+        file2_label = ttk.Label(frm, text="Choose second tab:",
                                 anchor="w", width=50)
         file2_label.pack()
 
@@ -559,14 +569,17 @@ class OperationTab(LinkTab):
 
         self.file2_select.pack(pady=5)
 
-        
-
-        buttons = {'Take Difference': self.take_difference} 
+        buttons = {'Take Difference': self.take_difference}
         button_box = self.create_button_box(frm, buttons,"h")
         button_box.pack(pady=5)
         frm.grid(row=self.row_counter,column=0,sticky="NS")
 
     def take_difference(self):
+        """ Takes a difference (not line by line) of the files specified by the
+        current selection in the two ComboBoxes in this Tab. Specifically, it
+        finds all lines on the first file which are not present in the second
+        file. """
+
         idx1 = self.file1_select.current()
         idx2 = self.file2_select.current()
 
@@ -592,10 +605,8 @@ class OperationTab(LinkTab):
         frm = ttk.Frame(master)
         for label, cmd in button_dict.items():
             btn = ttk.Button(frm, text=label, command=cmd)
-            if orientation == "vertical" or orientation=="v":
+            if orientation in ('vertical', 'v'):
                 btn.pack(side="top",pady=2)
-            elif orientation == "horizontal" or orientation == "h":
+            elif orientation in ('horizontal', 'h'):
                 btn.pack(side="left",padx=3)
         return frm
-
-

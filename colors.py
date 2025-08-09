@@ -1,25 +1,30 @@
+""" colors.py
+Author: Braden Carlson
 
-bg = "#454545"
-bg_active = "#757575"
-bg_inactive = "#555555"
-fg = "#ffffff"
-fg_active = fg
-fg_inactive="#ffffff"
+Defines the colors which are used throughout the application.  Defining them
+here makes it easier to change things later on and customize it. """
 
-bg_text = "#555555"
-fg_text = "#ffffff"
-text_insert = "#ffffff"
+BG = "#454545"
+BG_ACTIVE = "#757575"
+BG_INACTIVE = "#555555"
+FG = "#ffffff"
+FG_ACTIVE = "#ffffff"
+FG_INACTIVE ="#ffffff"
+
+BG_TEXT = "#555555"
+FG_TEXT = "#ffffff"
+TEXT_INSERT = "#ffffff"
 
 menu_style = {
-        'bg': bg, 
-        'fg': fg,
-        'activebackground': bg_active,
-        'activeforeground': fg_active,
+        'bg': BG, 
+        'fg': FG,
+        'activebackground': BG_ACTIVE,
+        'activeforeground': FG_ACTIVE,
         'bd': 0}
 
 text_style = {
-        'bg': bg_text,
-        'fg': fg_text,
+        'bg': BG_TEXT,
+        'fg': FG_TEXT,
         'bd': 0,
-        'insertbackground': text_insert,
+        'insertbackground': TEXT_INSERT,
         'font': "Ariel 12"}
