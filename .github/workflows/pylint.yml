@@ -20,4 +20,4 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        line=$(pylint $(git ls-files '*.py') | grep "rated") && if [[ $line =~ 9.*|10 ]]; then exit 1; else exit 0; fi
+        line=$(pylint $(git ls-files '*.py') | grep "rated") && if [[ $line =~ 9.*|10 ]]; then exit 0; else exit 1; fi
