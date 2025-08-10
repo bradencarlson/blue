@@ -425,9 +425,8 @@ class TextTab(LinkTab):
         except KeyError:
             rng = dlg.ask_num_range(self)
 
-        # ask_num_range returns a list with a single entry (-1) when the user
-        # hits the cancel button. In this case, just stop here.
-        if rng[0] == -1:
+        # ask_num_range returns None if the user presses Cancel. In this case, just stop here.
+        if rng == None:
             return
 
         content = self.get_content()

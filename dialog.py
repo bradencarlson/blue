@@ -265,10 +265,7 @@ def ask_num_range(master):
     """ Convenience method to create a CutDialog and get it's range. """
 
     d = CutDialog(master)
-    try:
-        return d.rng
-    except AttributeError:
-        return [-1]
+    return d.rng
 
 
 class ErrorDialog(Dialog):
