@@ -20,6 +20,12 @@ class NewTabDialog(Dialog):
     def __init__(self,master,title=None):
         """ Initialize the NewTabDialog. """
 
+        self.box = None
+        self.tabtitle = None
+        self.error_lbl = None
+        self.tablabel_result = None
+        self.tabkind = None
+
         ##################################################
         ### This was modified from the simpledialog.py, found at
         ### https://github.com/python/cpython/blob/3.13/Lib/tkinter/simpledialog.py
@@ -74,11 +80,6 @@ class NewTabDialog(Dialog):
         ### End content from simpledialog.py
         ##################################################
 
-        self.box = None
-        self.tabtitle = None
-        self.error_lbl = None
-        self.tablabel_result = None
-        self.tabkind = None
         return self.apply()
 
     def body(self, master):
@@ -154,6 +155,9 @@ class CutDialog(Dialog):
         """ This method was mostly copied from the simpledialog.py module, see
         below. """
 
+        self.rng_entry = None
+        self.rng = None
+
         ##################################################
         ### This was modified from the simpledialog.py, found at
         ### https://github.com/python/cpython/blob/3.13/Lib/tkinter/simpledialog.py
@@ -208,8 +212,6 @@ class CutDialog(Dialog):
         ### End content from simpledialog.py
         ##################################################
 
-        self.rng_entry = None
-        self.rng = None
         return self.apply()
 
     def body(self, master):
