@@ -46,10 +46,23 @@ def difference(file1, file2, **opts):
                     else:
                         matches.append(line)
                     line = f1.readline()
-    except FileNotFoundError: 
-        error(f"One of {file1} or {file2} does not exist.")
+    except FileNotFoundError:
+        error(None,msg=f"One of {file1} or {file2} does not exist.")
 
     return nonmatches
+
+def strip(string, char):
+    """ Strips all instances of char in string. """
+
+    lines = string.splitlines()
+
+    new_lines = []
+    for line in lines:
+        new_line = re.sub(char, '', line)
+        new_lines.append(new_line)
+
+    return '\n'.join(new_lines)
+
 
 def get_num_fields(lines, **opts):
     """ Get the smalled number of records which appears in any line of the file.

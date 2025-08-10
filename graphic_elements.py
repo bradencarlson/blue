@@ -433,6 +433,14 @@ class TextTab(LinkTab):
         new_content = fo.cut(content,f=rng)
         self.replace(1.0,"end", new_content)
 
+    def strip(self,char):
+        """ Takes the contents of the textarea and strips all instances of char
+        from it. """
+
+        content = self.get_content()
+        new_content = fo.strip(content, char)
+        self.replace(1.0,"end", new_content)
+
     def scroll(self,*args):
         """ Command that is performed when the scrollbar is moved or one of it's
         buttons is clicked, This adjusts the view of the file to match that of
