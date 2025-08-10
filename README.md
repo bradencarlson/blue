@@ -1,6 +1,9 @@
 # Blue
 
-![Pylint Badge](https://github.com/bradencarlson/blue/actions/workflows/pylint.yml/badge.svg)
+<span style="nowrap">
+<img alt="Linted with Pylint" src="https://github.com/bradencarlson/blue/actions/workflows/pylint.yml/badge.svg">
+<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/bradencarlson/blue"
+</span>
 
 ## Description
 
