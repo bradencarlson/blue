@@ -239,7 +239,8 @@ class TextTab(LinkTab):
                               "Sort": self.sort,
                               "Undo": self.undo,
                               "Redo": self.redo, 
-                              "Cut": self.cut}}
+                              "Cut": self.cut,
+                              "Strip": self.strip}}
 
         super().__init__(master, **kwargs, menu=default_menu_dict)
 
@@ -426,16 +427,24 @@ class TextTab(LinkTab):
             rng = dlg.ask_num_range(self)
 
         # ask_num_range returns None if the user presses Cancel. In this case, just stop here.
-        if rng == None:
+        if rng is None:
             return
 
         content = self.get_content()
         new_content = fo.cut(content,f=rng)
         self.replace(1.0,"end", new_content)
 
-    def strip(self,char):
+    def strip(self, **opts):
         """ Takes the contents of the textarea and strips all instances of char
         from it. """
+
+        try:
+            char = opts['char']
+        except KeyError:
+            char = dlg.ask_char(self)
+
+        if char == '':
+            return
 
         content = self.get_content()
         new_content = fo.strip(content, char)
