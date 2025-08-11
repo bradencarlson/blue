@@ -420,17 +420,23 @@ class TextTab(LinkTab):
     def cut(self,**opts):
         """ Call the cut method of the fops module on the current text. """
         rng = None
+        fs = None
         try:
-            rng = opts["r"]
+            rng = opts['r']
+            if 'fs' in opts.keys():
+                fs = opts['fs']
+            else:
+                fs = ','
+
         except KeyError:
-            rng = dlg.ask_num_range(self)
+            [rng, fs] = dlg.ask_num_range(self)
 
         # ask_num_range returns None if the user presses Cancel. In this case, just stop here.
-        if rng == None:
+        if rng is None:
             return
 
         content = self.get_content()
-        new_content = fo.cut(content,f=rng)
+        new_content = fo.cut(content,f=rng,fs=fs)
         self.replace(1.0,"end", new_content)
 
     def scroll(self,*args):

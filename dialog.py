@@ -87,7 +87,8 @@ class NewTabDialog(Dialog):
         name for the new tab, as well as what kind it will be. """
 
         frm = ttk.Frame(master)
-        lbl = ttk.Label(frm,text="Please enter a name for the new tab, along with what kind of tab it should be.",
+        lbl = ttk.Label(frm,text="Please enter a name for the new tab, \
+along with what kind of tab it should be.",
                         width=50,
                         wrap=1,
                         wraplength=350)
@@ -157,6 +158,8 @@ class CutDialog(Dialog):
 
         self.rng_entry = None
         self.rng = None
+        self.fs = None
+        self.fs_entry = None
 
         ##################################################
         ### This was modified from the simpledialog.py, found at
@@ -230,6 +233,14 @@ if necessary, i.e. 1-4,7-10) indicating which columns of data to KEEP.",
         self.rng_entry = Entry(frm)
         self.rng_entry.pack()
 
+        fs_label = ttk.Label(frm, text="Please enter a field separator (default \
+,)")
+
+        fs_label.pack()
+        self.fs_entry = Entry(frm)
+        self.fs_entry.pack()
+
+
         # Do not pack this here, this will be packed by the validate() method if
         # the provided range does not match the regex ^[0-9,-]+$
         self.err_msg = ttk.Label(frm, text="Something went wrong, please try again.",
@@ -258,6 +269,10 @@ if necessary, i.e. 1-4,7-10) indicating which columns of data to KEEP.",
         otherwise show the error message. """
 
         self.rng = self.rng_entry.get()
+        self.fs = self.fs_entry.get()
+        if self.fs == "":
+            self.fs = ","
+
         if regex.match(r'^[0-9,-]+$', self.rng) is None:
             self.err_msg.pack()
             return 0
@@ -267,7 +282,7 @@ def ask_num_range(master):
     """ Convenience method to create a CutDialog and get it's range. """
 
     d = CutDialog(master)
-    return d.rng
+    return [d.rng, d.fs]
 
 
 class ErrorDialog(Dialog):
