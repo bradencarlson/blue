@@ -172,3 +172,7 @@ def parse_num_range(rng):
             nums.append(i)
 
     return nums
+
+def join(filename_one, range_one, filename_two, range_two):
+    """ Takes columns from file one and columns from file two, and creates a
+    third file containing this join. """
