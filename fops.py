@@ -47,7 +47,7 @@ def difference(file1, file2, **opts):
                         matches.append(line)
                     line = f1.readline()
     except FileNotFoundError:
-        error(None,msg=f"One of {file1} or {file2} does not exist.")
+        error(None, f"One of {file1} or {file2} does not exist.")
 
     return nonmatches
 
@@ -72,7 +72,7 @@ def get_num_fields(lines, **opts):
     max_number_of_records = 1000
 
     try:
-        fs = opts['FS']
+        fs = opts['fs']
     except KeyError:
         fs = ","
 
