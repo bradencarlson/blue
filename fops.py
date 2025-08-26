@@ -176,3 +176,36 @@ def parse_num_range(rng):
 def join(filename_one, range_one, filename_two, range_two):
     """ Takes columns from file one and columns from file two, and creates a
     third file containing this join. """
+
+    try:
+        with open(filename_one, "r", encoding="utf-8") as file1:
+            with open(filename_two, "r", encoding="utf-8") as file2:
+                fs = ","
+                fileone_content = file1.read()
+                filetwo_content = file2.read()
+                fileone_cut = cut(fileone_content, f=range_one, fs=",")
+                filetwo_cut = cut(filetwo_content, f=range_two, fs=",")
+
+                lines_one = fileone_cut.splitlines()
+                lines_two = filetwo_cut.splitlines()
+
+                length_one = len(lines_one)
+                length_two = len(lines_two)
+
+                min_length = length_two if length_one >= length_two else length_one
+
+                new_lines = []
+
+                for i in range(0, min_length):
+                    new_lines.append(lines_one[i] + fs + lines_two[i])
+
+                if min_length == length_one:
+                    for line in lines_two[min_length:]:
+                        new_lines.append(line)
+                else:
+                    for line in lines_one[min_length:]:
+                        new_lines.append(line)
+
+                print(new_lines)
+    except Exception as e:
+        print(e)
